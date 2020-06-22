@@ -1,5 +1,17 @@
 ;; -*- mode: emacs-lisp -*-
 
+; ---------------------------------------------------------------------------- ;
+;                               SAKURA SPACEMACS                               ;
+; ---------------------------------------------------------------------------- ;
+;                             Author: Jonathan Crum                            ;
+;                            Version: 1.0                                      ;
+;                            Updated: 2020/06/22                               ;
+; ---------------------------------------------------------------------------- ;
+
+
+; ---------------------------------------------------------------------------- ;
+;                                    LAYERS                                    ;
+; ---------------------------------------------------------------------------- ;
 (defun dotspacemacs/layers ()
   (setq-default
    dotspacemacs-configuration-layer-path '((config  :location local)
@@ -8,6 +20,10 @@
    dotspacemacs-additional-packages '()
    dotspacemacs-excluded-packages '()))
 
+
+; ---------------------------------------------------------------------------- ;
+;                                     INIT                                     ;
+; ---------------------------------------------------------------------------- ;
 (defun dotspacemacs/init ()
   (setq-default
    dotspacemacs-elpa-https t
@@ -30,12 +46,20 @@
    dotspacemacs-mode-line-theme 'doom
    dotspacemacs-whitespace-cleanup 'trailing))
 
+
+; ---------------------------------------------------------------------------- ;
+;                                   FUNCTIONS                                  ;
+; ---------------------------------------------------------------------------- ;
 (defun my-save-if-bufferfilename()
   (if (buffer-file-name)
       (progn
         (save-buffer))
     (message "No file is associated with this buffer: doing nothing.")))
 
+
+; ---------------------------------------------------------------------------- ;
+;                                   USER INIT                                  ;
+; ---------------------------------------------------------------------------- ;
 (defun dotspacemacs/user-init ()
   ;; Package Archives
   (setq package-archives
@@ -48,6 +72,10 @@
   (setq custom-file "~/.spacemacs.d/.custom-settings.el")
   (load-file custom-file))
 
+
+; ---------------------------------------------------------------------------- ;
+;                                  USER CONFIG                                 ;
+; ---------------------------------------------------------------------------- ;
 (defun dotspacemacs/user-config ()
   ;; Requisites
   (require 'org)
