@@ -1,0 +1,155 @@
+{
+	"name": "comment-ts",
+	"displayName": "Comments in Typescript",
+	"description": "Generates JSDoc comments in TypeScript files.",
+	"version": "0.9.11",
+	"publisher": "salbert",
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"lint": "node ./node_modules/tslint/bin/tslint src/**/*.ts",
+		"compile": "npm run lint && tsc -p ./",
+		"publish": "vsce publish",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"icon": "images/icon.png",
+	"keywords": [
+		"comment",
+		"document",
+		"typescript",
+		"ts"
+	],
+	"galleryBanner": {
+		"color": "#252627",
+		"theme": "dark"
+	},
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.25.0"
+	},
+	"categories": [
+		"Other",
+		"Formatters",
+		"Snippets"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "comment-ts.commentThis",
+				"title": "comment-ts: Comment code"
+			},
+			{
+				"command": "comment-ts.getter",
+				"title": "comment-ts: Generate getter of private _"
+			},
+			{
+				"command": "comment-ts.setter",
+				"title": "comment-ts: Generate setter of private _"
+			},
+			{
+				"command": "comment-ts.getterAndSetter",
+				"title": "comment-ts: Generate getter and setter of private _"
+			},
+			{
+				"command": "comment-ts.allGetterAndSetter",
+				"title": "comment-ts: Generate ALL getter and setter of private _"
+			},
+			{
+				"command": "comment-ts.constructor",
+				"title": "comment-ts: Generate constructor with initialization of readonly fields"
+			},
+			{
+				"command": "comment-ts.interface",
+				"title": "comment-ts: Generate interface of readonly fields"
+			},
+			{
+				"command": "comment-ts.traceTypeScriptSyntaxNode",
+				"title": "comment-ts: Trace typeScript syntax node"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "comment-ts.commentThis",
+					"when": "editorLangId == typescript"
+				}
+			]
+		},
+		"keybindings": [
+			{
+				"command": "comment-ts.commentThis",
+				"key": "ctrl+alt+c ctrl+alt+c"
+			},
+			{
+				"command": "genGetSet.popup",
+				"key": "alt+shift+g alt+shift+g",
+				"when": "editorTextFocus"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Comment TS configuration",
+			"properties": {
+				"comment-ts.replaceComments": {
+					"type": "boolean",
+					"default": true,
+					"description": "When enabled, selected JSDoc comments will be updated, else the previous comments will be preserved."
+				},
+				"comment-ts.todoComments": {
+					"type": "boolean",
+					"default": false,
+					"description": "Inserts TODO in created comments."
+				},
+				"comment-ts.includeDescriptionTag": {
+					"type": "boolean",
+					"default": false,
+					"description": "When enabled, JSDoc comments for functions and methods will include @description."
+				},
+				"comment-ts.includeAuthorTag": {
+					"type": "boolean",
+					"default": false,
+					"description": "When enabled, will add the @author tag."
+				},
+				"comment-ts.authorName": {
+					"type": "string",
+					"default": "(Set the text for this tag by adding docthis.authorName to your settings file.)",
+					"description": "When comment-ts.includeAuthorTag is enabled, will add @author tag with this value."
+				},
+				"comment-ts.parseNames": {
+					"type": "boolean",
+					"default": true,
+					"description": "When comment-ts.parseNames is enabled, comments are generated from the name semantics."
+				},
+				"comment-ts.scoped": {
+					"type": "boolean",
+					"default": true,
+					"description": "Only show private variables from current class based on cursor position."
+				}
+			}
+		}
+	},
+	"devDependencies": {
+		"@types/mocha": "^5.2.5",
+		"@types/node": "^10.12.18",
+		"tslint": "^5.12.0",
+		"vscode": "^1.1.26"
+	},
+	"dependencies": {
+		"typescript": "^3.2.2"
+	},
+	"bugs": {
+		"url": "https://github.com/s-albert/comment-ts/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/s-albert/comment-ts.git"
+	},
+	"__metadata": {
+		"id": "bfa3c8e5-2106-4c95-a6d5-d8d02ed1b194",
+		"publisherId": "7bc01a80-11a1-47ad-a8dc-a4e28f77e044",
+		"publisherDisplayName": "s.albert"
+	}
+}

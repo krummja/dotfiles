@@ -1,0 +1,16 @@
+! -- Styles - Colors
+#include "/home/krummja/.config/regolith/styles/simulacrum/color"
+
+! -- Styles - Fonts
+#include "/home/krummja/.config/regolith/styles/simulacrum/typeface"
+
+! -- Styles - Theme
+#include "/home/krummja/.config/regolith/styles/simulacrum/theme"
+
+! -- Applications
+! These files map values defined above into specific app settings.
+#include "/home/krummja/.config/regolith/styles/simulacrum/st-term"
+#include "/home/krummja/.config/regolith/styles/simulacrum/i3-wm"
+#include "/home/krummja/.config/regolith/styles/i3xrocks"
+#include "/home/krummja/.config/regolith/styles/rofi"
+#include "/home/krummja/.config/regolith/styles/gnome"

@@ -1,0 +1,42 @@
+{
+	"name": "clj-kondo",
+	"description": "Clj-kondo language server and client bundled in one extension.",
+	"author": "Michiel Borkent",
+	"license": "EPL-1",
+	"version": "2020.6.21",
+	"publisher": "borkdude",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/borkdude/clj-kondo.lsp"
+	},
+	"engines": {
+		"vscode": "^1.33.0"
+	},
+	"main": "./out/extension.js",
+	"activationEvents": [
+		"onLanguage:clojure"
+	],
+	"icon": "icon.png",
+	"scripts": {
+		"vscode:prepublish": "npm run update-vscode && npm run compile",
+		"compile": "tsc -b",
+		"watch": "tsc -b -w",
+		"update-vscode": "vscode-install",
+		"postinstall": "vscode-install"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^5.2.1"
+	},
+	"devDependencies": {
+		"@types/mocha": "^5.2.0",
+		"@types/node": "^8.0.0",
+		"tslint": "^5.16.0",
+		"typescript": "^3.6.4",
+		"vscode": "^1.1.35"
+	},
+	"__metadata": {
+		"id": "c7bb45cf-29a3-4477-abc8-0ee9f3dfd3fc",
+		"publisherId": "b5980dc8-dd66-4f17-8fa4-2f7357e6e4d8",
+		"publisherDisplayName": "borkdude"
+	}
+}
