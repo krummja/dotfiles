@@ -1,42 +1,82 @@
-;; -*- mode: emacs-lisp -*-
+#+TITLE:    Sakura Emacs - Literate Configuration
+#+AUTHOR:   Jonathan Crum
+#+PROPERTY: header-args :tangle yes
 
-(defun dotspacemacs/layers ()
-  (setq-default
-   dotspacemacs-distribution 'spacemacs
-   dotspacemacs-enable-lazy-installation 'unused
-   dotspacemacs-ask-for-lazy-installation t
-   dotspacemacs-configuration-layer-path '()
-   dotspacemacs-configuration-layers
-   '((auto-completion :variables
-                      auto-completion-enable-snippets-in-popup t
-                      auto-completion-enable-sort-by-usage t)
-     bibtex
-     emacs-lisp
-     helm
-     javascript
-     markdown
-     typescript
-     org
-     )
-   dotspacemacs-additional-packages
-   '(
-     deft
-     doom-modeline
-     doom-themes
-     guide-key
-     magit
-     org-noter
-     org-ref
-     org-roam
-     pdfgrep
-     pdf-tools
-     typescript-mode
-     zotxt
-     )
-   dotspacemacs-frozen-packages '()
-   dotspacemacs-excluded-packages '()
-   dotspacemacs-install-packages 'used-only))
+* Table of Contents                                                :TOC_3_gh:
+- [[#configuration][Configuration]]
+  - [[#about-this-file][About This File]]
+  - [[#org-file-tweaks][Org File Tweaks]]
+    - [[#automatic-tangle][Automatic Tangle]]
+  - [[#layers][Layers]]
+  - [[#init][Init]]
 
+* Configuration
+:PROPERTIES:
+:VISIBILITY: children
+:END:
+
+** About This File
+** Org File Tweaks
+*** Automatic Tangle
+There is a property defined in the header metadata of this file.
+
+#+BEGIN_SRC :tangle no
+header-args :tangle yes
+#+END_SRC
+
+This tells emacs to automatically tangle all of the code blocks in this file when generating the code for the configuration, unless we explicitly define =:tangle no= in the code block options.
+
+** Layers
+#+BEGIN_SRC emacs-lisp
+  ;; -*- mode: emacs-lisp -*-
+
+  (defun dotspacemacs/layers ()
+    (setq-default
+     dotspacemacs-distribution 'spacemacs
+     dotspacemacs-enable-lazy-installation 'unused
+     dotspacemacs-ask-for-lazy-installation t
+     dotspacemacs-configuration-layer-path '()
+     dotspacemacs-configuration-layers
+     '((auto-completion :variables
+                        auto-completion-enable-snippets-in-popup t
+                        auto-completion-enable-sort-by-usage t)
+       bibtex
+       emacs-lisp
+       helm
+       javascript
+       markdown
+       typescript
+       org
+       )
+     dotspacemacs-additional-packages
+     '(
+       deft
+       doom-modeline
+       doom-themes
+       guide-key
+       magit
+       org-noter
+       org-ref
+       org-roam
+       pdfgrep
+       pdf-tools
+       typescript-mode
+       zotxt
+       )
+     dotspacemacs-frozen-packages '()
+     dotspacemacs-excluded-packages '()
+     dotspacemacs-install-packages 'used-only))
+
+#+END_SRC
+
+** Init
+[[~/.emacs.d/core/core-dotspacemacs.el][Core Dotspacemacs]]
+
+Many of the variables in this section of the init file are defined in core-dotspacemacs.
+
+Importantly, it is in this file that the environment variable =SPACEMACSDIR= is defined. There is logic for finding first the =init.el= in =~/.emacs.d/=, then any configuration in =~/.spacemacs.d/= if it is defined, and finally =~/.spacemacs=.
+
+#+BEGIN_SRC emacs-lisp
 (defun dotspacemacs/init ()
   (setq-default
    dotspacemacs-elpa-https t
@@ -273,3 +313,4 @@
                                 '("arara" "arara %s" TeX-run-Tex nil t
                                   :help "Run arara on the current file.")
                                 TeX-command-list))))
+#+END_SRC

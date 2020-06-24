@@ -1,0 +1,5 @@
+(require 'org)
+(org-babel-tangle-file "sakura.org")
+(setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+(byte-compile-file "sakura.el")
+(byte-compile-file "init.el")
