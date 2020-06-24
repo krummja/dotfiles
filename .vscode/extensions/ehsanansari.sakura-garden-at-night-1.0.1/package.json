@@ -1,0 +1,28 @@
+{
+	"name": "sakura-garden-at-night",
+	"displayName": "Sakura Garden At Night",
+	"publisher": "EhsanAnsari",
+	"icon": "images/sgan.png",
+	"description": "A happy dark theme for low light coding. Based on a warm color palette to prevent eye strain and retinal damage. Designed mainly for Dart and Flutter.",
+	"version": "1.0.1",
+	"engines": {
+		"vscode": "^1.32.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Sakura Garden At Night",
+				"uiTheme": "vs-dark",
+				"path": "./themes/Sakura Garden At Night-color-theme.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "6d8d7b4d-0614-4740-8f89-4183fa40be09",
+		"publisherId": "1b2b73ad-9e62-4901-b8e0-0b1514e9274e",
+		"publisherDisplayName": "Esan Ansari"
+	}
+}
