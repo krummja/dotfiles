@@ -1,0 +1,87 @@
+#+TITLE:    Sakura Emacs Planning Documentation
+
+* Table of Contents :TOC_3_gh:
+- [[#planning][Planning]]
+  - [[#layers][Layers]]
+    - [[#auto-completion][Auto-Completion]]
+    - [[#bibtex][Bibtex]]
+    - [[#emacs-lisp][Emacs-Lisp]]
+    - [[#helm][Helm]]
+    - [[#markdown][Markdown]]
+    - [[#org][Org]]
+  - [[#spacemacs-packages][Spacemacs Packages]]
+  - [[#additional-packages][Additional Packages]]
+    - [[#deft][Deft]]
+    - [[#doom-modeline][Doom-Modeline]]
+    - [[#doom-themes][Doom-Themes]]
+    - [[#guide-key][Guide-Key]]
+    - [[#magit][Magit]]
+    - [[#org-noter][Org-Noter]]
+    - [[#org-ref][Org-Ref]]
+    - [[#org-roam][Org-Roam]]
+    - [[#pdfgrep][Pdfgrep]]
+    - [[#pdf-tools][Pdf-Tools]]
+    - [[#zotxt][Zotxt]]
+  - [[#keybindings][Keybindings]]
+  - [[#theming][Theming]]
+  - [[#other-comments][Other Comments]]
+- [[#lisp-notes][Lisp Notes]]
+  - [[#set][set]]
+  - [[#setq][setq]]
+  - [[#setq-default][setq-default]]
+
+* Planning
+My biggest goal for Emacs is to have a totally customized configuration from the ground up.
+I think this should be possible, especially since I realized I could just... you know, make an experimental branch for my dotfiles repo.
+So then, here I want to start piecing together what components I find appealing about stock Spacemacs so that I can figure out how to implement them on my own.
+
+** Layers
+*** Auto-Completion
+*** Bibtex
+*** Emacs-Lisp
+*** Helm
+*** Markdown
+*** Org
+** Spacemacs Packages
+I need to see what packages are installed with Spacemacs that I take for granted, but that are not presently in my configuration.
+
+** Additional Packages
+*** Deft
+*** Doom-Modeline
+*** Doom-Themes
+*** Guide-Key
+*** Magit
+*** Org-Noter
+*** Org-Ref
+*** Org-Roam
+*** Pdfgrep
+*** Pdf-Tools
+*** Zotxt
+
+** Keybindings
+** Theming
+Ideally I want to make a central theme that has a light and dark mode. The name of the config, *Sakura*, should give an idea of what I am going for. The color palette should be soothing, and ideally inspired by the cherry blossom.
+
+[[https://github.com/lepisma/rogue][Lepisma's Rogue configuration]] has a very similar aesthetic to it, and it will be a great exemplar to look at for theming.
+** Other Comments
+
+* Lisp Notes
+** set
+The function =set= binds a variable to a value. The syntax is:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(set 'carnivores '(lion tiger leopard))
+#+END_SRC
+
+The first argument is quoted, a convention that is so frequent it has been abbreviated into a special =setq= function.
+
+** setq
+The function =setq= is identical to =set= but for the fact that it abbreviates the first argument's quote.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(setq carnivores '(lion tiger leopard))
+#+END_SRC
+** setq-default
+Some variables in Emacs are "buffer-local", which means that each buffer is allowed to have a separate value for that variable that overrides a global default. If a given variable is buffer-local, =setq= sets its value in the current buffer, and =setq-default= sets the global value.
+
+If, however, the variable is not buffer-local, then =setq= and =setq-default= are identical.

@@ -1,101 +1,21 @@
 #+TITLE:    Sakura Emacs - Literate Configuration
 #+AUTHOR:   Jonathan Crum
-#+PROPERTY: header-args :tangle "./init.el"
 
 * Table of Contents                                                :TOC_3_gh:
-- [[#planning][Planning]]
+- [[#core-init][Core Init]]
   - [[#layers][Layers]]
-    - [[#auto-completion][Auto-Completion]]
-    - [[#bibtex][Bibtex]]
-    - [[#emacs-lisp][Emacs-Lisp]]
-    - [[#helm][Helm]]
-    - [[#markdown][Markdown]]
-    - [[#org][Org]]
-  - [[#spacemacs-packages][Spacemacs Packages]]
-  - [[#additional-packages][Additional Packages]]
-    - [[#deft][Deft]]
-    - [[#doom-modeline][Doom-Modeline]]
-    - [[#doom-themes][Doom-Themes]]
-    - [[#guide-key][Guide-Key]]
-    - [[#magit][Magit]]
-    - [[#org-noter][Org-Noter]]
-    - [[#org-ref][Org-Ref]]
-    - [[#org-roam][Org-Roam]]
-    - [[#pdfgrep][Pdfgrep]]
-    - [[#pdf-tools][Pdf-Tools]]
-    - [[#zotxt][Zotxt]]
-  - [[#keybindings][Keybindings]]
-  - [[#theming][Theming]]
-  - [[#other-comments][Other Comments]]
-- [[#configuration][Configuration]]
-  - [[#about-this-file][About This File]]
-  - [[#org-file-tweaks][Org File Tweaks]]
-    - [[#automatic-tangle][Automatic Tangle]]
-  - [[#layers-1][Layers]]
   - [[#init][Init]]
   - [[#functions][Functions]]
   - [[#user-init][User Init]]
   - [[#user-config][User Config]]
-- [[#lisp-notes][Lisp Notes]]
-  - [[#set][set]]
-  - [[#setq][setq]]
-  - [[#setq-default][setq-default]]
+- [[#sakura][Sakura]]
 
-* Planning
-My biggest goal for Emacs is to have a totally customized configuration from the ground up.
-I think this should be possible, especially since I realized I could just... you know, make an experimental branch for my dotfiles repo.
-So then, here I want to start piecing together what components I find appealing about stock Spacemacs so that I can figure out how to implement them on my own.
-
-** Layers
-*** Auto-Completion
-*** Bibtex
-*** Emacs-Lisp
-*** Helm
-*** Markdown
-*** Org
-** Spacemacs Packages
-I need to see what packages are installed with Spacemacs that I take for granted, but that are not presently in my configuration.
-
-** Additional Packages
-*** Deft
-*** Doom-Modeline
-*** Doom-Themes
-*** Guide-Key
-*** Magit
-*** Org-Noter
-*** Org-Ref
-*** Org-Roam
-*** Pdfgrep
-*** Pdf-Tools
-*** Zotxt
-
-** Keybindings
-** Theming
-Ideally I want to make a central theme that has a light and dark mode. The name of the config, *Sakura*, should give an idea of what I am going for. The color palette should be soothing, and ideally inspired by the cherry blossom.
-
-[[https://github.com/lepisma/rogue][Lepisma's Rogue configuration]] has a very similar aesthetic to it, and it will be a great exemplar to look at for theming.
-** Other Comments
-
-* Configuration
+* Core Init
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** About This File
-** Org File Tweaks
-*** Automatic Tangle
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-There is a property defined in the header metadata of this file.
-
-#+BEGIN_SRC
-header-args :tangle yes
-#+END_SRC
-
-This tells emacs to automatically tangle all of the code blocks in this file when generating the code for the configuration, unless we explicitly define =:tangle no= in the code block options.
-
 ** Layers
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
   ;; -*- mode: emacs-lisp -*-
 
   ;; S A K U R A Spacemacs
@@ -103,11 +23,9 @@ This tells emacs to automatically tangle all of the code blocks in this file whe
   (defun dotspacemacs/layers ()
     (setq-default
      dotspacemacs-distribution 'spacemacs
-     dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
+     dotspacemacs-configuration-layer-path '("~/.spacemacs.d/sakura/")
      dotspacemacs-configuration-layers
-     '((config   :location local)
-       (display  :location local)
-       (sakura   :location local)
+     '((sakura   :location local)
 
        (auto-completion :variables
                         auto-completion-enable-snippets-in-popup t
@@ -148,7 +66,7 @@ Many of the variables in this section of the init file are defined in core-dotsp
 
 Importantly, it is in this file that the environment variable =SPACEMACSDIR= is defined. There is logic for finding first the =init.el= in =~/.emacs.d/=, then any configuration in =~/.spacemacs.d/= if it is defined, and finally =~/.spacemacs=.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun dotspacemacs/init ()
   (setq-default
    dotspacemacs-elpa-https t
@@ -182,7 +100,7 @@ Importantly, it is in this file that the environment variable =SPACEMACSDIR= is 
 #+END_SRC
 
 ** Functions
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun my-save-if-bufferfilename()
   (if (buffer-file-name)
       (progn
@@ -197,7 +115,7 @@ Importantly, it is in this file that the environment variable =SPACEMACSDIR= is 
 #+END_SRC
 
 ** User Init
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun dotspacemacs/user-init ()
   (defconst user-layer-dir (file-name-as-directory "~/.spacemacs.d/local/sakura"))
 
@@ -221,7 +139,7 @@ Importantly, it is in this file that the environment variable =SPACEMACSDIR= is 
 #+END_SRC
 
 ** User Config
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun dotspacemacs/user-config ()
   ;; Requisites
   (require 'org)
@@ -360,23 +278,19 @@ Importantly, it is in this file that the environment variable =SPACEMACSDIR= is 
                                 TeX-command-list))))
 #+END_SRC
 
-* Lisp Notes
-** set
-The function =set= binds a variable to a value. The syntax is:
+* Sakura
 
-#+BEGIN_SRC emacs-lisp :tangle no
-(set 'carnivores '(lion tiger leopard))
+#+BEGIN_SRC emacs-lisp :tangle "./sakura/sakura.el"
+;; -*- mode: emacs-lisp -*-
+
+(require 'deft)
+(require 'org)
+(require 'org-noter)
+(require 'org-ref)
+(require 'org-roam)
+(require 'pdfgrep)
+(require 'pdf-tools)
+(require 'zotxt)
+
+(provide 'sakura)
 #+END_SRC
-
-The first argument is quoted, a convention that is so frequent it has been abbreviated into a special =setq= function.
-
-** setq
-The function =setq= is identical to =set= but for the fact that it abbreviates the first argument's quote.
-
-#+BEGIN_SRC emacs-lisp :tangle no
-(setq carnivores '(lion tiger leopard))
-#+END_SRC
-** setq-default
-Some variables in Emacs are "buffer-local", which means that each buffer is allowed to have a separate value for that variable that overrides a global default. If a given variable is buffer-local, =setq= sets its value in the current buffer, and =setq-default= sets the global value.
-
-If, however, the variable is not buffer-local, then =setq= and =setq-default= are identical.
