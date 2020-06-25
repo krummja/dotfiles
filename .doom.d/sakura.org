@@ -1,3 +1,15 @@
+#+TITLE:    Sakura
+#+AUTHOR:   Jonathan Crum
+
+* Table of Contents :TOC_3_gh:
+- [[#configuration][Configuration]]
+  - [[#init][Init]]
+  - [[#packages][Packages]]
+  - [[#config][Config]]
+
+* Configuration
+** Init
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 ;;; init.el -*- lexical-binding: t; -*-
 
 ;;; S A K U R A
@@ -179,3 +191,37 @@
        :config
        ;;literate
        (default +bindings +smartparens))
+#+END_SRC
+** Packages
+#+BEGIN_SRC emacs-lisp :tangle "./packages.el"
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+
+(package! pdf-tools)
+(package! org-ref)
+(package! interleave)
+(package! helm-bibtex)
+#+END_SRC
+
+** Config
+#+BEGIN_SRC emacs-lisp :tangle "./config.el"
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+(setq user-full-name "John Doe"
+      user-mail-address "john@doe.com")
+
+(setq doom-font "Fira Code")
+(setq doom-theme 'doom-one)
+
+(setq display-line-numbers-type t)
+
+(setq org-directory "~/org/")
+(setq org-ref-notes-directory "~/Dropbox/Notebook/References/Notes"
+      org-ref-bibliography-notes "~/Dropbox/Notebook/References/notes.org"
+      org-ref-default-bibliography "~/Dropbox/Notebook/References/master.bib"
+      org-ref-pdf-directory "~/Dropbox/Library/")
+
+(setq helm-bibtex-bibliography "~/Dropbox/Notebook/References/master.bib"
+      helm-bibtex-library-path "~/Dropbox/Library/"
+      helm-bibtex-notes-path "~/Dropbox/Notebook/References/notes.org")
+#+END_SRC
