@@ -7,9 +7,10 @@
    dotspacemacs-distribution 'spacemacs
    dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
    dotspacemacs-configuration-layers
-   '((config   :location local)
-     (display  :location local)
-     (sakura   :location local)
+   '(
+	 ;;(config   :location local)
+     ;;(display  :location local)
+     ;;(sakura   :location local)
 
      (auto-completion :variables
                       auto-completion-enable-snippets-in-popup t
@@ -83,6 +84,7 @@
   (run-at-time "0.5 sec" nil #'org-noter))
 
 (defun dotspacemacs/user-init ()
+
   ;; Package Archives
   (require 'package)
   (setq package-enable-at-startup nil)
