@@ -5,13 +5,9 @@
 (defun dotspacemacs/layers ()
   (setq-default
    dotspacemacs-distribution 'spacemacs
-   dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
+   dotspacemacs-configuration-layer-path '()
    dotspacemacs-configuration-layers
-   '((config   :location local)
-     (display  :location local)
-     (sakura   :location local)
-
-     (auto-completion :variables
+   '((auto-completion :variables
                       auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-sort-by-usage t)
      bibtex
@@ -83,6 +79,8 @@
   (run-at-time "0.5 sec" nil #'org-noter))
 
 (defun dotspacemacs/user-init ()
+  (defconst user-layer-dir (file-name-as-directory "~/.spacemacs.d/local/sakura"))
+
   ;; Package Archives
   (require 'package)
   (setq package-enable-at-startup nil)

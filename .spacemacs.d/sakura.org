@@ -22,11 +22,9 @@
   (defun dotspacemacs/layers ()
     (setq-default
      dotspacemacs-distribution 'spacemacs
-     dotspacemacs-configuration-layer-path '("~/.spacemacs.d/sakura/")
+     dotspacemacs-configuration-layer-path '()
      dotspacemacs-configuration-layers
-     '((sakura   :location local)
-
-       (auto-completion :variables
+     '((auto-completion :variables
                         auto-completion-enable-snippets-in-popup t
                         auto-completion-enable-sort-by-usage t)
        bibtex
