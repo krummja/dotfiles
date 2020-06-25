@@ -8,7 +8,6 @@
   - [[#functions][Functions]]
   - [[#user-init][User Init]]
   - [[#user-config][User Config]]
-- [[#sakura][Sakura]]
 
 * Core Init
 :PROPERTIES:
@@ -276,21 +275,4 @@ Importantly, it is in this file that the environment variable =SPACEMACSDIR= is 
                                 '("arara" "arara %s" TeX-run-Tex nil t
                                   :help "Run arara on the current file.")
                                 TeX-command-list))))
-#+END_SRC
-
-* Sakura
-
-#+BEGIN_SRC emacs-lisp :tangle "./sakura/sakura.el"
-;; -*- mode: emacs-lisp -*-
-
-(require 'deft)
-(require 'org)
-(require 'org-noter)
-(require 'org-ref)
-(require 'org-roam)
-(require 'pdfgrep)
-(require 'pdf-tools)
-(require 'zotxt)
-
-(provide 'sakura)
 #+END_SRC
