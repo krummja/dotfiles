@@ -171,3 +171,5 @@ if [ -d ~/.texmf ] ; then
 fi
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
+
+alias doomsync='/home/krummja/.emacs.d/bin/doom sync'
