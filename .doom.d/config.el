@@ -1,141 +1,55 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-(setq user-full-name "Jonathan Crum"
+;; Here are some additional functions/macros that could help you configure Doom:
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+
+;; NOTE: Consider splitting this into separate files, and load them into this one.
+;; NOTE: This is a great fuckin' config: https://github.com/glynnforrest/emacs.d/blob/master/site-lisp/setup-org.el
+
+(setq user-full-name    "Jonathan Crum"
       user-mail-address "crumja@uga.edu")
 
+;; Path Variables
 (setq
-    NOTEBOOK      (concat (getenv "HOME") "/Notebook/")
-    BIBLIOGRAPHY  (concat (getenv "HOME") "/texmf/bibtex/bib/master.bib")
-    org-directory         NOTEBOOK
-    deft-directory        NOTEBOOK
-    org-roam-directory    NOTEBOOK
-    )
+ NOTEBOOK     (concat (getenv "HOME") "/Dropbox/Notebook")
+ BIBLIOGRAPHY (concat (getenv "HOME") "/texmf/bibtex/bib/master.bib"))
 
-;; Deft
-(use-package deft
-  :commands deft
-  :init
-  (setq deft-default-extension "org"
-        deft-use-filename-as-title nil
-        deft-use-filter-string-for-filename t
-        deft-auto-save-interval -1.0
-        deft-file-naming-rules
-        '((noslash . "-")
-          (nospace . "-")
-          (case-fn . downcase)))
-  :config
-  (add-to-list 'deft-extensions "tex"))
+(use-package! pdf-tools)
+(use-package! rainbow-mode)
+(use-package! direx)
+(use-package! popwin)
+(push '(direx:direx-mode :position left :width 25 :dedicated t)
+      popwin:special-display-config)
 
-;; Helm Bibtex
-(setq
-    bibtex-completion-notes-path    NOTEBOOK
-    bibtex-completion-bibliography  BIBLIOGRAPHY
-    bibtex-completion-pdf-field     "file"
-    bibtex-completion-notes-template-multiple-files
-    (concat
-        "#+TITLE: ${title}\n"
-        "#+ROAM_KEY: cite:${=key}\n"
-        "* TODO Notes\n"
-        ":PROPERTIES:\n"
-        ":Custom_ID: ${=key=}\n"
-        ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
-        ":AUTHOR: ${author-abbrev}\n"
-        ":JOURNAL: ${journaltitle}\n"
-        ":DATE: ${date}\n"
-        ":YEAR: ${year}\n"
-        ":DOI: ${doi}\n"
-        ":URL: ${url}\n"
-        ":END:\n\n"))
+;; PDF-View
+(require 'pdf-view)
+(setq pdf-info-epdfinfo-program "/usr/bin/epdfinfo")
+(setq pdf-view-midnight-colors `(,(face-attribute 'default :foreground) .
+                                 ,(face-attribute 'default :background)))
+(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
+(add-hook 'pdf-view-mode-hook (lambda ()
+                                (pdf-view-midnight-minor-mode)))
+(provide 'init-pdfview)
 
-;; Org-Ref
-(use-package org-ref
-    :config
-    (setq
-        org-ref-completion-library 'org-ref-ivy-cite
-        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-        org-ref-default-bibliography (list BIBLIOGRAPHY)
-        org-ref-bibliography-notes (concat (NOTEBOOK) "/bibnotes.org")
-        org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n :Custom_ID: %k\n :NOTER_DOCUMENT: %f\n :ROAM_KEY: cite:%k\n :AUTHOR: %9a\n :JOURNAL: %j\n :YEAR: %y\n :VOLUME: %v\n :PAGES: %p\n :DOI: %D\n :URL: %U\n :END:\n\n"))
+(remove-hook 'text-mode-hook #'auto-fill-mode)
 
-;; Org-Roam
-(use-package org-roam
-  :hook (org-load .org-roam-mode)
-  :commands (org-roam-buffer-toggle-display
-             org-roam-find-file
-             org-roam-graph
-             org-roam-insert
-             org-roam-switch-to-buffer
-             org-roam-dailies-date
-             org-roam-dailies-today
-             org-roam-dailies-tomorrow
-             org-roam-dailies-yesterday)
-  :preface
-  ;; Set this to nil so we can later detect whether the user has set a custom
-  ;; directory for it, and default to `org-directory' if they haven't.
-  (defvar org-roam-directory nil)
-  :init
-  :config
-  (setq org-roam-directory (expand-file-name (or org-roam-directory "roam")
-                                             org-directory)
-        org-roam-verbose nil
-        org-roam-buffer-no-delete-other-windows t
-        org-roam-completion-system 'default
-
-        (add-hook 'find-file-hook
-                  (defun +org-roam-open-buffer-maybe-h ()
-                    (and +org-roam-open-buffer-on-find-file
-                         (memq 'org-roam-buffer--update-maybe post-command-hook)
-                         (not (window-parameter nil 'window-side))
-                         (not (eq 'visible (org-roam-buffer--visibility)))
-                         (with-current-buffer (window-buffer)
-                           (org-roam-buffer--get-create)))))
-
-        (add-hook 'org-roam-buffer-prepare-hook #'hide-mode-line-mode)))
-
-(use-package org-roam-protocol
-  :after org-protocol)
-
-(use-package company-org-roam
-    :after org-roam
-    :config
-    (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
-
-(use-package org-roam-bibtex
-    :after (org-roam)
-    :hook (org-roam-mode . org-roam-bibtex-mode)
-    :config
-    (setq org-roam-bibtex-preformat-keywords
-          '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-    (setq orb-templates
-          '(("r" "ref" plain (function org-roam-capture--get-point)
-             ""
-             :file-name "${slug}"
-             :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
-
-- tags ::
-- keywords :: ${keywords}
-
-\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-
-           :unnarrowed t))))
-
-;; Org-Noter
-(use-package org-noter
-    :after (:any org pdf-view)
-    :config
-    (setq
-        org-noter-notes-window-location 'other-frame
-        org-noter-always-create-frame nil
-        org-noter-hide-other nil
-        org-noter-notes-search-path (list NOTEBOOK)))
-
-;; PDFgrep
-
-;; PDF-Tools
-
-;; Zotxt
-
-(setq doom-font (font-spec :family "Fira Code" :size 10))
-(setq doom-theme 'doom-one)
-
-(setq display-line-numbers-type t)
+(load! "+theming.el")
+(load! "+notebook-suite.el")
+(load! "+bindings")
+(load! "+functions")
+(load! "themes/doom-sakura-dark-theme.el")
+(load! "themes/doom-sakura-light-theme.el")
