@@ -1,0 +1,72 @@
+ls
+clear
+ls
+cd ..
+ls
+cd Python/
+ls
+cd Notebook/
+ls
+emacs emacs.py
+find-file emacs.py
+ls
+mkdir elisp
+py ./new_test.py
+python3 ./new_test.py
+xelatex diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara diagrams.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+ls
+rm sandbox.aux sandbox.tex\~
+ls
+clear
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+arara sandbox.tex
+cp sakura.org sakura.org.bak
+ls
+clear

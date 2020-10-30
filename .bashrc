@@ -166,10 +166,26 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-if [ -d ~/.texmf ] ; then
-	export TEXMFHOME=~/.texmf
-fi
-
 alias dotfiles='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 
 alias doomsync='/home/krummja/.emacs.d/bin/doom sync'
+
+if [ -d ~/.texmf ]; then
+		export TEXMFHOME="~/texmf"
+fi
+
+export PATH="$HOME/.local/bin/:$PATH"
+export PATH="$HOME/dart-sdk/sdk/out/ReleaseX64/dart-sdk/bin/:$PATH"
+export PATH="$HOME/.cargo/bin/:$PATH"
+
+alias wacom="sudo bash ~/.local/bin/wacom"
+
+alias py="python3"
+
+export CORPUS_REGISTRY="/media/RTEST/"
+
+export PLANTUML_LIMIT_SIZE=60000
+
+export EDITOR="vim"
+export PYTHONPATH="/usr/bin/python3"
+export PYTHONPATH="$HOME/Workspace/Python/:$PYTHONPATH"

@@ -1,0 +1,2 @@
+;;; Generated package description from /home/krummja/.emacs.d/elpa/org-journal-20201023.1627/org-journal.el  -*- no-byte-compile: t -*-
+(define-package "org-journal" "20201023.1627" "a simple org-mode based journaling mode" '((emacs "25.1") (org "9.1")) :commit "34c290c58793617df3ba5458ea586317436ffc2b" :authors '(("Bastian Bechtold") ("Christian Schwarzgruber")) :maintainer '("Bastian Bechtold") :url "http://github.com/bastibe/org-journal")
