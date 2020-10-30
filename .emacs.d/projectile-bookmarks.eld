@@ -1,1 +1,0 @@
-("~/Notebook/" "~/Workspace/LaTeX/Classic/" "~/Workspace/Python/Simulacra_Engine/" "~/.emacs.d/" "~/Workspace/Python/sandbox/")
