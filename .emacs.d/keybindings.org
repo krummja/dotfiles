@@ -1,0 +1,86 @@
+#+TITLE: Keybindings
+
+* General Overview
+* Keymaps
+** C-x
+| chord | function | notes |
+|-------+----------+-------|
+|       |          |       |
+
+** SPC
+| chord   | namespace | function                  | notes         |
+|---------+-----------+---------------------------+---------------|
+| RET     | bookmarks |                           |               |
+| RET RET |           | bookmark-list             |               |
+| RET d   |           | bookmark-delete           |               |
+| RET n   |           | bookmark-set              |               |
+|---------+-----------+---------------------------+---------------|
+| a       | agenda    |                           |               |
+|---------+-----------+---------------------------+---------------|
+| b       | buffers   |                           |               |
+| bb      |           | switch-to-buffer          |               |
+| bd      |           | buffer-delete             |               |
+|---------+-----------+---------------------------+---------------|
+| c       |           |                           |               |
+| d       |           |                           |               |
+| e       |           |                           |               |
+| f       |           |                           |               |
+| g       |           |                           |               |
+| h       |           |                           |               |
+|---------+-----------+---------------------------+---------------|
+| i       | insert    |                           |               |
+| ic      |           | insert citation           |               |
+| il      |           | insert link               |               |
+|---------+-----------+---------------------------+---------------|
+| j       | journal   |                           |               |
+| jj      |           | new entry                 |               |
+|---------+-----------+---------------------------+---------------|
+| k       |           |                           |               |
+| l       |           |                           |               |
+| m       |           |                           |               |
+|---------+-----------+---------------------------+---------------|
+| n       | notes     |                           |               |
+|---------+-----------+---------------------------+---------------|
+| o       | open      |                           |               |
+| of      |           | make-frame                |               |
+|---------+-----------+---------------------------+---------------|
+| p       | projects  |                           |               |
+|---------+-----------+---------------------------+---------------|
+| q       |           |                           |               |
+| r       |           |                           |               |
+|---------+-----------+---------------------------+---------------|
+| s       | search    |                           |               |
+| sf      |           | helm-org-rifle-files      |               |
+| so      |           | helm-org-rifle-occur      |               |
+| sr      |           | helm-org-rifle            |               |
+| ss      |           | swiper                    | unimplemented |
+|---------+-----------+---------------------------+---------------|
+| t       | toggles   |                           |               |
+| tt      |           | choose theme              |               |
+|---------+-----------+---------------------------+---------------|
+| u       |           |                           |               |
+| v       |           |                           |               |
+|---------+-----------+---------------------------+---------------|
+| w       | windows   |                           |               |
+| w-      |           | split-window-vertically   |               |
+| w/      |           | split-window-horizontally |               |
+| wd      |           | delete-window             |               |
+|---------+-----------+---------------------------+---------------|
+| x       |           |                           |               |
+| y       |           |                           |               |
+| z       |           |                           |               |
+* Notes
+So when configuring a package using =use-package= it appears I can use the =:bind-keymap= macro to ... er, bind that package's keymap.
+
+#+BEGIN_SRC emacs-lisp
+(use-package some-package
+  :config (some-package-mode)
+  :bind-keymap 
+  ("C-c p" . some-package-command-map))
+#+END_SRC
+
+Because I'm using =general= to manage keybindings, it's actually really simple to just swap out my leader key. Instead of =SPC=, I'm trying to use the =C-c <key>= scheme.
+
+One possibility I might explore is using =SPC= to do mode-specific bindings, e.g. if I'm in LaTeX mode, use =SPC= to pull up a customized palette of commands for that mode. This would allow, among other things, the binding of =C-x b= to =buffers= in the global context, but =SPC-b= to =bibtex= - but only in, say, LaTeX mode.
+
+evil-undo-system

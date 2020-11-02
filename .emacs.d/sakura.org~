@@ -549,6 +549,11 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0))))
 #+END_SRC
 
+*** PDF-GREP
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
+(use-package pdf-grep)
+#+END_SRC
+
 *** Powerthesaurus
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package powerthesaurus)
@@ -614,6 +619,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 ** Dark Theme
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 #+END_SRC
+** Tweaks
 * Inspirations
 - [[https://github.com/howardabrams/dot-files][Howard Abrams]]
 - [[https://github.com/daedreth/UncleDavesEmacs/blob/master/config.org][Uncle Daves Emacs]]
@@ -622,5 +628,3 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 - [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org][Daviwil]]
 - [[https://writequit.org/org/][Writequit]]
 - [[https://doc.rix.si/cce/cce.html][Complete Computing Environment]]
-
-

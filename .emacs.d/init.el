@@ -38,6 +38,10 @@
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+(use-package undo-tree)
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -45,6 +49,7 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-i-jump nil)
   (setq evil-respect-visual-line-mode t)
+  (setq evil-undo-system 'undo-tree)
   :config
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
@@ -159,8 +164,22 @@
   "w" '(:ignore t :which-key "windows")
   "w-" 'split-window-vertically
   "w/" 'split-window-horizontally
-  "wd" 'delete-window
+  "wd" 'delete-window)
+
+(sakura/leader-key-def
+  "o" '(:ignore t :which-key "open")
   "of" 'make-frame)
+
+(sakura/leader-key-def
+  "b" '(:ignore t :which-key "buffer")
+  "bb" '(switch-to-buffer :which-key "switch-to-buffer")
+  "bd" '(kill-buffer :which-key "kill-buffer"))
+
+(sakura/leader-key-def
+  "C-m" '(:ignore t :which-key "bookmarks")
+  "C-m n" '(bookmark-set :which-key "bookmark-set")
+  "C-m d" '(bookmark-delete :which-key "bookmark-delete")
+  "C-m C-m" '(bookmark-bmenu-list :which-key "bookmark-list"))
 
 (use-package projectile
   :diminish projectile-mode
@@ -175,9 +194,11 @@
 (use-package counsel-projectile
   :after projectile)
 
+(sakura/leader-key-def
+  "p" '(:ignore t :which-key "projectile"))
+
 (defun sakura/org-mode-setup ()
   (org-indent-mode)
-;  (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (setq evil-auto-indent nil))
@@ -210,19 +231,20 @@
   :after org
   :hook (org-mode . org-bullets-mode)
   :custom
-  (org-bullets-bullet-list '("-" "-" "-")))
+  (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
 
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (require 'org-indent)
-;; (setq org-hide-leading-stars t)
+
 (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
 (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
 (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
 (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+
 (custom-theme-set-faces
  'user
   `(org-document-info-keyword ((t :foreground "#9F9F9F")))
@@ -239,16 +261,17 @@
 
   `(org-block            ((t :inherit 'fixed-pitch)))
   `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
-  `(org-block-end-line   ((t :foreground "#BF9B9F"
-			     :background nil
-			     :underline nil
-			     :overline "#2A2A2A")))
+  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
   `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
 
-  `(org-table   ((t :background "#ebe6ea")))
-  `(org-formula ((t :background "#ebe6ea")))
-  `(org-ref-cite-face ((t :foreground "#BE3445")))
-  `(org-drawer ((t :foreground "#9F9F9F"))))
+  `(org-table            ((t :background "#272727")))
+  `(org-formula          ((t :background "#272727")))
+  `(org-ref-cite-face    ((t :foreground "#BE3445")))
+  `(org-drawer           ((t :foreground "#9F9F9F"))))
+
+
+
+
 
 (defun sakura/org-path (path)
   (expand-file-name path org-directory))
@@ -277,6 +300,107 @@
   (org-journal-time-format "%-l:%M %p - ")
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-enable-agenda-integration t))
+
+(sakura/leader-key-def
+  "j" '(:ignore t :which-key "journal")
+  "jj" '(org-journal-new-entry :which-key "new entry"))
+
+(sakura/leader-key-def
+  "n" '(:ignore t :which-key "notebook")
+  "nb" '(:ignore t :which-key "bibtex"))
+
+(use-package helm-bibtex
+  :defer t
+  :config 
+  (setq bibtex-completion-bibliography BIBLIOGRAPHY)
+  (setq bibtex-completion-library-path LIBRARY)
+  (setq bibtex-completion-pdf-field "File")
+  (setq bibtex-completion-notes-path NOTEBOOK)
+  (setq bibtex-completion-notes-template-multiple-files
+        (concat
+         "#+TITLE: ${title}\n"
+         "#+ROAM_KEY: cite:${=key=}\n"
+         "* TODO Notes\n"
+         ":PROPERTIES:\n"
+         ":Custom_ID: ${=key=}\n"
+         ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+         ":AUTHOR: ${author-abbrev}\n"
+         ":JOURNAL: ${journaltitle}\n"
+         ":DATE: ${date}\n"
+         ":YEAR: ${year}\n"
+         ":DOI: ${doi}\n"
+         ":URL: ${url}\n"
+         ":END:")))
+
+(use-package helm-org-rifle)
+
+(sakura/leader-key-def
+  "s" '(:ignore t :which-key "search")
+  "sr" '(helm-org-rifle :which-key "helm-org-rifle")
+  "so" '(helm-org-rifle-occur :which-key "helm-org-rifle-occur")
+  "sf" '(helm-org-rifle-files :which-key "helm-org-rifle-files"))
+
+;; Note: I need to figure out how to make C-j and C-k work in the occur buffer.
+
+(use-package org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq org-noter-notes-window-location 'other-frame)
+  (setq org-noter-always-create-frame nil)
+  (setq org-noter-hide-other nil)
+  (setq org-noter-notes-search-path '("~/Notebook")))
+
+(use-package org-ref
+  :after (:any org org-noter org-roam))
+
+(use-package org-roam
+  :ensure t
+  :hook (after-init . org-roakm-mode)
+  :config
+  (setq org-roam-directory NOTEBOOK))
+
+(sakura/leader-key-def
+  "nr" '(org-roam :which-key "org-roam")
+  "nf" '(org-roam-find-file :which-key "org-roam-find-file")
+  "ng" '(org-roam-graph-show :which-key "org-roam-graph-show")
+  "ni" '(org-roam-insert :which-key "org-roam-insert")
+  "nI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
+
+(use-package org-roam-bibtex
+  :after (org-roam)
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (setq org-roam-bibtex-preformat-keywords
+        '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+- tags ::
+- keywords :: ${keywords}
+
+\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+           :unnarrowed t))))
+
+(sakura/leader-key-def
+  "nba" '(orb-note-actions :which-key "orb-note-actions"))
+
+(use-package pdf-tools
+  :if (display-graphic-p)
+  :mode ("\\.pdf$" . pdf-view-mode)
+  :init (load "pdf-tools-autoloads" nil t)
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0))))
+
+(use-package powerthesaurus)
+
+(sakura/leader-key-def
+  "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
 
 (use-package markdown-mode
   :pin melpa-stable

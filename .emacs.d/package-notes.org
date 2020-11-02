@@ -1,0 +1,34 @@
+#+TITLE: Package Notes
+
+* Design Specifications
+I have three primary contexts for using emacs for research.
+
+- =Taking notes in Org-Mode=
+  While in Org, I want to be able to create notes files for documents in Zotero. This is done easily enough using Org-Noter. I can add citation links with Org-Ref and, on evaluating the link, have Org-Noter generate a notes file. When in this notes file, I can pull the PDF associated with the citation entry.
+
+  I should also be able to search through all Org files in my Notebook directory, and search within any Org file currently open.
+
+  Org-Roam allows for handy backlinking and other neat features.
+
+- =Viewing PDFs=
+- =LaTeX Editing=
+
+* Packages
+** Helm-BibTeX
+A search engine for bibliography files.
+** Helm-Org-Rifle
+A search engine across and among org files.
+** LaTeX-Mode
+** Org-Mode
+** Org-Noter
+Emacs PDF annotation.
+** Org-Ref
+Org-mode modules for citation management.
+** Org-Roam
+Org port of Roam Research.
+** Org-Roam-BibTeX
+Bridge package between Org-Roam and BibTeX.
+** PDF-Tools
+** PDFView
+** Swiper
+A search engine within org files.
