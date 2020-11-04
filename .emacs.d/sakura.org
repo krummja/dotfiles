@@ -163,7 +163,8 @@ Very handle little binding to make canceling inputs easier.
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (dolist (mode '(org-mode-hook
-		eshell-mode-hook))
+		eshell-mode-hook
+		pdf-view-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
@@ -327,7 +328,8 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 	org-hide-block-startup nil
 	org-src-preserve-indentation nil
 	org-startup-folded 'content
-	org-cycle-separator-lines 2)
+	org-cycle-separator-lines 2
+	org-directory NOTEBOOK)
 
   (setq org-refile-targets '((nil :maxlevel . 3)
 			     (org-agenda-files :maxlevel . 3)))
@@ -448,6 +450,12 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   (setq bibtex-completion-library-path LIBRARY)
   (setq bibtex-completion-pdf-field "File")
   (setq bibtex-completion-notes-path NOTEBOOK)
+  (setq bibtex-completion-display-formats 
+	'((article       . "${=has-pdf=:1}${=has-note=:1} ${=type=:3} ${year:4} ${author:36} ${title:80} ${journal:30}")
+	  (inbook        . "${=has-pdf=:1}${=has-note=:1} ${=type=:3} ${year:4} ${author:36} ${title:80} Chapter ${chapter:26}")
+	  (incollection  . "${=has-pdf=:1}${=has-note=:1} ${=type=:3} ${year:4} ${author:36} ${title:80} ${booktitle:30}")
+	  (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${=type=:3} ${year:4} ${author:36} ${title:80} ${booktitle:30}")
+	  (t             . "${=has-pdf=:1}${=has-note=:1} ${=type=:3} ${year:4} ${author:36} ${title:80}")))
   (setq bibtex-completion-notes-template-multiple-files
         (concat
          "#+TITLE: ${title}\n"
@@ -465,15 +473,17 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
          ":END:")))
 #+END_SRC
 
-*** Helm-Org-Rifle
+*** Helm-Swoop
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
-(use-package helm-org-rifle)
+(use-package helm-swoop)
 
 (sakura/leader-key-def
   "s" '(:ignore t :which-key "search")
-  "sr" '(helm-org-rifle :which-key "helm-org-rifle")
-  "so" '(helm-org-rifle-occur :which-key "helm-org-rifle-occur")
-  "sf" '(helm-org-rifle-files :which-key "helm-org-rifle-files"))
+  "ss" '(helm-swoop :which-key "swoop")
+  "sa" '(helm-multi-swoop-all :which-key "swoop all the things")
+  "sp" '(helm-multi-swoop-projectile :which-key "swoop project")
+  "so" '(helm-multi-swoop-org :which-key "swoop org")
+  "sc" '(helm-multi-swoop-current-mode :which-key "swoop same as current"))
 
 ;; Note: I need to figure out how to make C-j and C-k work in the occur buffer.
 #+END_SRC
@@ -488,28 +498,53 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   (setq org-noter-hide-other nil)
   (setq org-noter-notes-search-path '("~/Notebook")))
 
+(sakura/leader-key-def 
+  "nn" '(:ignore t :which-key "noter")
+  "nnn" '(org-noter :which-key "org-noter")
+  "nni" '(org-noter-insert-note :which-key "insert note")
+  "nnI" '(org-noter-insert-precise-note :which-key "insert note precise"))
 #+END_SRC
 
 *** Org-Ref
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-ref
-  :after (:any org org-noter org-roam))
+  :after (:any org org-noter org-roam)
+  :config
+  (setq reftex-default-bibliography BIBLIOGRAPHY)
+
+  (setq org-ref-bibliography-notes "~/Notebook/index.org")
+  (setq org-ref-default-bibliography '("~/texmf/bibtex/bib/master.bib"))
+  (setq org-ref-pdf-directory "~/Dropbox/Library")
+  (setq org-ref-completion-library 'helm-bibtex)
+  (setq org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex)
+  (setq org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n")
+  (setq org-ref-notes-directory "~/Notebook")
+  (setq org-ref-notes-function 'orb-edit-notes))
+
+  (setq bibtex-completion-bibliography BIBLIOGRAPHY)
+  (setq bibtex-completion-library-path LIBRARY)
+  (setq bibtex-completion-notes-path NOTEBOOK)
+
+(sakura/leader-key-def
+  "nbb" '(helm-bibtex :which-key "helm-bibtex")
+  "nbn" '(helm-bibtex-with-notes :which-key "helm-bibtex-with-notes"))
 #+END_SRC
 
 *** Org-Roam
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-roam
   :ensure t
-  :hook (after-init . org-roakm-mode)
+  :hook (after-init . org-roam-mode)
   :config
   (setq org-roam-directory NOTEBOOK))
 
 (sakura/leader-key-def
-  "nr" '(org-roam :which-key "org-roam")
-  "nf" '(org-roam-find-file :which-key "org-roam-find-file")
-  "ng" '(org-roam-graph-show :which-key "org-roam-graph-show")
-  "ni" '(org-roam-insert :which-key "org-roam-insert")
-  "nI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
+  "nr" '(:ignore t :which-key "roam")
+  "nrr" '(org-roam :which-key "org-roam")
+  "nrf" '(org-roam-find-file :which-key "org-roam-find-file")
+  "nrg" '(org-roam-graph-show :which-key "org-roam-graph-show")
+  "nri" '(org-roam-insert :which-key "org-roam-insert")
+  "nrI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
 #+END_SRC
 
 *** Org-Roam-BibTeX
@@ -611,9 +646,14 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 #+END_SRC
 
 ** Light Theme
+#+BEGIN_SRC emacs-lisp :tanlge "./init.el"
+
+#+END_SRC
+
 ** Dark Theme
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 #+END_SRC
+
 * Inspirations
 - [[https://github.com/howardabrams/dot-files][Howard Abrams]]
 - [[https://github.com/daedreth/UncleDavesEmacs/blob/master/config.org][Uncle Daves Emacs]]
