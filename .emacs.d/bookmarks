@@ -2,16 +2,26 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Index"
+(("org-refile-last-stored"
+ (filename . "~/Notebook/org-linkz/Linkz.org")
+ (front-context-string . "** [[https://git")
+ (rear-context-string . "-10 Tue 15:56]\n\n")
+ (position . 2145))
+("Linkz"
+ (filename . "~/Notebook/org-linkz/Linkz.org")
+ (front-context-string . "* INBOX\n** [[htt")
+ (rear-context-string)
+ (position . 1))
+("Index"
  (filename . "~/Notebook/index.org")
  (front-context-string . "#+TITLE: Index\n\n")
  (rear-context-string)
  (position . 1))
 ("org-capture-last-stored"
- (filename . "~/.notes")
- (front-context-string . "** TODO \n  [2020")
- (rear-context-string)
- (position . 9))
+ (filename . "~/Notebook/org-linkz/Linkz.org")
+ (front-context-string . "** [[https://ema")
+ (rear-context-string . "1-26 Thu 13:33]\n")
+ (position . 461))
 ("Sakura Configuration"
  (filename . "~/.emacs.d/sakura.org")
  (front-context-string . "** Modeline\n#+BE")

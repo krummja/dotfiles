@@ -1,5 +1,10 @@
+(server-start)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 (setq-default fill-column 80)
 
 (scroll-bar-mode -1)
@@ -11,6 +16,13 @@
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
+
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 
 (setq user-full-name "Jonathan Crum")
 (setq user-mail-address "crumja@uga.edu")
@@ -65,6 +77,11 @@
   :config
   (evil-collection-init))
 
+(with-eval-after-load 'evil-maps
+  (define-key evil-motion-state-map (kbd "SPC") nil)
+  (define-key evil-motion-state-map (kbd "RET") nil)
+  (define-key evil-motion-state-map (kbd "TAB") nil))
+
 (use-package which-key
   :init (which-key-mode)
   :diminish which-key-mode
@@ -93,11 +110,14 @@
   (dashboard-setup-startup-hook))
 
 (column-number-mode)
-(global-display-line-numbers-mode t)
-(dolist (mode '(org-mode-hook
-		eshell-mode-hook
-		pdf-view-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+(global-display-line-numbers-mode -1)
+;; (dolist (mode '(org-mode-hook
+;; 		eshell-mode-hook
+;; 		pdf-view-mode-hook
+;; 		neotree-mode
+;; 		org-agenda
+;; 		org-agenda-mode))
+;;   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil 
 		    :font "Fira Code Retina"
@@ -143,6 +163,7 @@
 	 ("C-k" . ivy-previous-line)
 	 ("C-d" . ivy-reverse-i-search-kill))
   :config
+  (setq ivy-use-selectable-prompt t)
   (ivy-mode 1))
 
 (use-package ivy-rich
@@ -156,6 +177,9 @@
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history)))
 
+(sakura/leader-key-def
+  "SPC" '(counsel-find-file :which-key "find file"))
+
 (use-package ace-window
   :bind (("M-o" . ace-window))
   :config
@@ -165,7 +189,11 @@
   "w" '(:ignore t :which-key "windows")
   "w-" 'split-window-vertically
   "w/" 'split-window-horizontally
-  "wd" 'delete-window)
+  "wd" 'delete-window
+  "wh" 'evil-window-left
+  "wl" 'evil-window-right
+  "wk" 'evil-window-up
+  "wj" 'evil-window-down)
 
 (sakura/leader-key-def
   "o" '(:ignore t :which-key "open")
@@ -182,6 +210,10 @@
   "C-m d" '(bookmark-delete :which-key "bookmark-delete")
   "C-m C-m" '(bookmark-bmenu-list :which-key "bookmark-list"))
 
+(sakura/leader-key-def
+  "n" '(:ignore t :which-key "notebook")
+  "nb" '(:ignore t :which-key "bibtex"))
+
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -196,7 +228,16 @@
   :after projectile)
 
 (sakura/leader-key-def
-  "p" '(:ignore t :which-key "projectile"))
+  "p" '(:ignore t :which-key "projectile")
+  "pf" '(counsel-projectile-find-file :which-key "find file"))
+
+(use-package neotree)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(add-hook 'neo-after-create-hook
+	  (lambda (&rest _) (display-line-numbers-mode -1)))
+
+(sakura/leader-key-def
+  "t`" '(neotree-toggle :which-key "neotree"))
 
 (defun sakura/org-mode-setup ()
   (org-indent-mode)
@@ -214,9 +255,10 @@
 	org-edit-src-content-indentation 0
 	org-hide-block-startup nil
 	org-src-preserve-indentation nil
-	org-startup-folded 'content
+	org-startup-folded t
 	org-cycle-separator-lines 2
-	org-directory NOTEBOOK)
+	org-directory NOTEBOOK
+	org-return-follows-link t)
 
   (setq org-refile-targets '((nil :maxlevel . 3)
 			     (org-agenda-files :maxlevel . 3)))
@@ -235,43 +277,57 @@
   :custom
   (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
 
+(require 'org-indent)
+
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-(require 'org-indent)
+(sakura/leader-key-def
+  "l" '(:ignore t :which-key "links")
+  "ll" '(org-store-link :which-key "org-store-link")
+  "li" '(org-insert-link :which-key "org-insert-link")
+  "lI" '(org-insert-all-links :which-key "org-insert-all-links"))
 
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(setq org-agenda-files '("~/Notebook"))
+(setq org-agenda-format-date (lambda (date) (concat "\n"
+						    (make-string (window-width) 9472)
+						    "\n"
+						    (org-agenda-format-date-aligned date))))
+(setq org-agenda-custom-commands
+      '(("c" "Simple agenda view"
+	 ((tags "PRIORITY=\"A\""
+		((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+		 (org-agenda-overriding-header "High-priority unfinished tasks:")))
+	  (agenda "" ((org-agenda-ndays 1)))
+	  (alltodo ""
+		   ((org-agenda-skip-function '(or
+						(sakura/org-skip-subtree-if-habit)
+						(sakura/org-skip-subtree-if-priority ?A)
+						(org-agenda-skip-if nil '(scheduled deadline))))
+		    (org-agenda-overridding-header "\n\nALL normal priority tasks:"))))
+	 ((org-agenda-block-separator "-")))))
 
-(custom-theme-set-faces
- 'user
-  `(org-document-info-keyword ((t :foreground "#9F9F9F")))
+(defun sakura/org-skip-subtree-if-priority (priority)
+  "Skip an agenda subtree if it has a priority of PRIORITY.
 
-  `(org-level-1 ((t :foreground "#BE3445" :weight bold)))
-  `(org-level-2 ((t :foreground "#BE3445" :weight bold)))
-  `(org-level-3 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-4 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-5 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-6 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-7 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-8 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-9 ((t :foreground "#BE3445" :weight normal)))
+PRIORITY may be one of the characters ?A, ?B or ?C."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+	(pri-value (* 1000 (- org-lowest-priority priority)))
+	(pri-current (org-get-priority (thing-at-point 'line t))))
+    (if (= pri-value pri-current)
+	subtree-end
+      nil)))
+		   
+(defun sakura/org-skip-subtree-if-habit ()
+  "Skip an agenda entry if it has a style property equal to \"habit\"."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+    (if (string= (org-entry-get nil "STYLE") "habit")
+	subtree-end
+      nil)))
 
-  `(org-block            ((t :inherit 'fixed-pitch)))
-  `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
-  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
-  `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
-
-  `(org-table            ((t :background "#272727")))
-  `(org-formula          ((t :background "#272727")))
-  `(org-ref-cite-face    ((t :foreground "#BE3445")))
-  `(org-drawer           ((t :foreground "#9F9F9F"))))
-
-
+(sakura/leader-key-def
+  "na" '(org-agenda :which-key "agenda"))
 
 
 
@@ -307,9 +363,14 @@
   "j" '(:ignore t :which-key "journal")
   "jj" '(org-journal-new-entry :which-key "new entry"))
 
-(sakura/leader-key-def
-  "n" '(:ignore t :which-key "notebook")
-  "nb" '(:ignore t :which-key "bibtex"))
+(setq org-html-validation-link nil)
+(require 'org-protocol)
+(setq org-capture-templates
+      '(("o" "Link capture" entry
+	 (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
+	 "* %a %U"
+	 :immediate-finish t)))
+(setq org-protocol-default-template-key "o")
 
 (use-package helm-bibtex
   :defer t
@@ -402,6 +463,26 @@
   "nri" '(org-roam-insert :which-key "org-roam-insert")
   "nrI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
 
+(require 'org-roam-protocol)
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-rome-server-host "127.0.0.1"
+	org-roam-server-port 8080
+	org-roam-server-authenticate nil
+	org-roam-server-export-inline-images t
+	org-roam-server-files nil
+	org-roam-server-served-file-extensions '("pdf" "md" "tex" "bib")
+	org-roam-server-network-poll t
+	org-roam-server-network-arrows nil
+	org-roam-server-network-label-truncate t
+	org-roam-server-label-truncate-length 60
+	org-roam-server-network-label-wrap-length 20))
+
+(sakura/leader-key-def
+  "nrv" '(org-roam-server-mode :which-key "visualize roam"))
+
 (use-package org-roam-bibtex
   :after (org-roam)
   :hook (org-roam-mode . org-roam-bibtex-mode)
@@ -438,6 +519,9 @@
 (sakura/leader-key-def
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
 
+(use-package smartparens)
+(require 'smartparens-config)
+
 (use-package markdown-mode
   :pin melpa-stable
   :mode "\\.md\\'"
@@ -469,12 +553,65 @@
   (company-quickhelp-mode))
 
 (use-package rust-mode)
+(use-package cargo)
+(add-hook 'rust-mode-hook 'cargo-minor-mode)
+(add-hook 'rust-mode-hook
+	  (lambda ()
+	    (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+(use-package racer
+  :config
+  (setq racer-cmd "~/.cargo/bin/racer/")
+  (setq racer-rust-src-path "~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/"))
 
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'rust-mode-hook #'smartparens-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+(add-hook 'racer-mode-hook #'company-mode)
+
+(use-package flycheck-rust)
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+
+(setq custom-theme-load-path '("~/.emacs.d/themes/"))
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
-  (load-theme 'doom-gruvbox t)
+  (load-theme 'doom-sakura-light t)
   (doom-themes-visual-bell-config))
+
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+
+(custom-theme-set-faces
+ 'user
+  `(org-document-info-keyword ((t :foreground "#9F9F9F")))
+
+  `(org-level-1 ((t :foreground "#2a2a2a" :weight bold)))
+  `(org-level-2 ((t :foreground "#2a2a2a" :weight bold)))
+  `(org-level-3 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-4 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-5 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-6 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-7 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-8 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-9 ((t :foreground "#2a2a2a" :weight normal)))
+
+  `(org-block            ((t :inherit 'fixed-pitch)))
+  `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
+  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
+  `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
+
+  `(org-table            ((t :background "#FBF7EF")))
+  `(org-formula          ((t :background "#FBF7EF")))
+  `(org-ref-cite-face    ((t :foreground "#BE3445")))
+  `(org-drawer           ((t :foreground "#9F9F9F")))
+
+  `(ivy-current-match    ((t :foreground "#2A2A2A"))))
+
+(set-frame-parameter (selected-frame) 'alpha '(85 85))
+(add-to-list 'default-frame-alist '(alpha 85 85))
 
 

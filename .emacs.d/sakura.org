@@ -12,8 +12,13 @@ These are settings that affect the entire workflow experience in emacs. This inc
 I want to set a few initial options to provide a clean slate to work with.
 
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
+(server-start)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 (setq-default fill-column 80)
 
 (scroll-bar-mode -1)
@@ -31,6 +36,16 @@ I definitely don't want to have a bunch of auto-generated code in my config file
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
 #+END_SRC
+
+** Backups
+#+begin_src emacs-lisp :tangle "./init.el"
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+#+end_src
 
 ** Basic Information
 A little bit of information about me.
@@ -117,6 +132,11 @@ Very handle little binding to make canceling inputs easier.
   (evil-collection-outline-bind-tab-p nil)
   :config
   (evil-collection-init))
+
+(with-eval-after-load 'evil-maps
+  (define-key evil-motion-state-map (kbd "SPC") nil)
+  (define-key evil-motion-state-map (kbd "RET") nil)
+  (define-key evil-motion-state-map (kbd "TAB") nil))
 #+END_SRC
 
 *** Keybinding Panel (which-key)
@@ -161,11 +181,14 @@ Very handle little binding to make canceling inputs easier.
 ** Line and Column Numbers
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (column-number-mode)
-(global-display-line-numbers-mode t)
-(dolist (mode '(org-mode-hook
-		eshell-mode-hook
-		pdf-view-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+(global-display-line-numbers-mode -1)
+;; (dolist (mode '(org-mode-hook
+;; 		eshell-mode-hook
+;; 		pdf-view-mode-hook
+;; 		neotree-mode
+;; 		org-agenda
+;; 		org-agenda-mode))
+;;   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
 ** Font Configuration
@@ -235,6 +258,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 	 ("C-k" . ivy-previous-line)
 	 ("C-d" . ivy-reverse-i-search-kill))
   :config
+  (setq ivy-use-selectable-prompt t)
   (ivy-mode 1))
 
 (use-package ivy-rich
@@ -247,6 +271,9 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history)))
+
+(sakura/leader-key-def
+  "SPC" '(counsel-find-file :which-key "find file")) 
 #+END_SRC
 
 ** Window Management
@@ -264,7 +291,11 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "w" '(:ignore t :which-key "windows")
   "w-" 'split-window-vertically
   "w/" 'split-window-horizontally
-  "wd" 'delete-window)
+  "wd" 'delete-window
+  "wh" 'evil-window-left
+  "wl" 'evil-window-right
+  "wk" 'evil-window-up
+  "wj" 'evil-window-down)
 
 (sakura/leader-key-def
   "o" '(:ignore t :which-key "open")
@@ -278,6 +309,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "bb" '(switch-to-buffer :which-key "switch-to-buffer")
   "bd" '(kill-buffer :which-key "kill-buffer"))
 #+END_SRC
+
 ** Bookmarks
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def
@@ -286,7 +318,15 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "C-m d" '(bookmark-delete :which-key "bookmark-delete")
   "C-m C-m" '(bookmark-bmenu-list :which-key "bookmark-list"))
 #+END_SRC
+
 * Package Configuration
+*** Notebook Keybinding
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
+(sakura/leader-key-def
+  "n" '(:ignore t :which-key "notebook")
+  "nb" '(:ignore t :which-key "bibtex"))
+#+END_SRC
+
 ** General
 *** Version Control (magit)
 *** Project Management (projectile)
@@ -305,8 +345,20 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   :after projectile)
 
 (sakura/leader-key-def
-  "p" '(:ignore t :which-key "projectile"))
+  "p" '(:ignore t :which-key "projectile")
+  "pf" '(counsel-projectile-find-file :which-key "find file"))
 #+END_SRC
+
+*** Neotree
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package neotree)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(add-hook 'neo-after-create-hook
+	  (lambda (&rest _) (display-line-numbers-mode -1)))
+
+(sakura/leader-key-def
+  "t`" '(neotree-toggle :which-key "neotree"))
+#+end_src
 
 *** Org-Mode
 **** General Configuration
@@ -327,9 +379,10 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 	org-edit-src-content-indentation 0
 	org-hide-block-startup nil
 	org-src-preserve-indentation nil
-	org-startup-folded 'content
+	org-startup-folded t
 	org-cycle-separator-lines 2
-	org-directory NOTEBOOK)
+	org-directory NOTEBOOK
+	org-return-follows-link t)
 
   (setq org-refile-targets '((nil :maxlevel . 3)
 			     (org-agenda-files :maxlevel . 3)))
@@ -348,49 +401,60 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   :custom
   (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
 
+(require 'org-indent)
+
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-#+END_SRC
 
-**** Font Tweaks
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
-(require 'org-indent)
-
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-
-(custom-theme-set-faces
- 'user
-  `(org-document-info-keyword ((t :foreground "#9F9F9F")))
-
-  `(org-level-1 ((t :foreground "#BE3445" :weight bold)))
-  `(org-level-2 ((t :foreground "#BE3445" :weight bold)))
-  `(org-level-3 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-4 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-5 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-6 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-7 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-8 ((t :foreground "#BE3445" :weight normal)))
-  `(org-level-9 ((t :foreground "#BE3445" :weight normal)))
-
-  `(org-block            ((t :inherit 'fixed-pitch)))
-  `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
-  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
-  `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
-
-  `(org-table            ((t :background "#272727")))
-  `(org-formula          ((t :background "#272727")))
-  `(org-ref-cite-face    ((t :foreground "#BE3445")))
-  `(org-drawer           ((t :foreground "#9F9F9F"))))
+(sakura/leader-key-def
+  "l" '(:ignore t :which-key "links")
+  "ll" '(org-store-link :which-key "org-store-link")
+  "li" '(org-insert-link :which-key "org-insert-link")
+  "lI" '(org-insert-all-links :which-key "org-insert-all-links"))
 #+END_SRC
 
 **** Org-Agenda
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
+(setq org-agenda-files '("~/Notebook"))
+(setq org-agenda-format-date (lambda (date) (concat "\n"
+						    (make-string (window-width) 9472)
+						    "\n"
+						    (org-agenda-format-date-aligned date))))
+(setq org-agenda-custom-commands
+      '(("c" "Simple agenda view"
+	 ((tags "PRIORITY=\"A\""
+		((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+		 (org-agenda-overriding-header "High-priority unfinished tasks:")))
+	  (agenda "" ((org-agenda-ndays 1)))
+	  (alltodo ""
+		   ((org-agenda-skip-function '(or
+						(sakura/org-skip-subtree-if-habit)
+						(sakura/org-skip-subtree-if-priority ?A)
+						(org-agenda-skip-if nil '(scheduled deadline))))
+		    (org-agenda-overridding-header "\n\nALL normal priority tasks:"))))
+	 ((org-agenda-block-separator "-")))))
 
+(defun sakura/org-skip-subtree-if-priority (priority)
+  "Skip an agenda subtree if it has a priority of PRIORITY.
+
+PRIORITY may be one of the characters ?A, ?B or ?C."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+	(pri-value (* 1000 (- org-lowest-priority priority)))
+	(pri-current (org-get-priority (thing-at-point 'line t))))
+    (if (= pri-value pri-current)
+	subtree-end
+      nil)))
+		   
+(defun sakura/org-skip-subtree-if-habit ()
+  "Skip an agenda entry if it has a style property equal to \"habit\"."
+  (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+    (if (string= (org-entry-get nil "STYLE") "habit")
+	subtree-end
+      nil)))
+
+(sakura/leader-key-def
+  "na" '(org-agenda :which-key "agenda"))
 #+END_SRC
 
 **** Org-Capture
@@ -433,14 +497,19 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "jj" '(org-journal-new-entry :which-key "new entry"))
 #+END_SRC
 
-** Research
-*** Notebook Keybinding
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
-(sakura/leader-key-def
-  "n" '(:ignore t :which-key "notebook")
-  "nb" '(:ignore t :which-key "bibtex"))
-#+END_SRC
+*** Org-Linkz
+#+begin_src emacs-lisp :tangle "./init.el"
+(setq org-html-validation-link nil)
+(require 'org-protocol)
+(setq org-capture-templates
+      '(("o" "Link capture" entry
+	 (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
+	 "* %a %U"
+	 :immediate-finish t)))
+(setq org-protocol-default-template-key "o")
+#+end_src
 
+** Research
 *** Helm-BibTeX
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package helm-bibtex
@@ -547,6 +616,32 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "nrI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
 #+END_SRC
 
+*** Org-Roam-Protocol
+#+begin_src emacs-lisp :tangle "./init.el"
+(require 'org-roam-protocol)
+#+end_src
+
+*** Org-Roam-Server
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-rome-server-host "127.0.0.1"
+	org-roam-server-port 8080
+	org-roam-server-authenticate nil
+	org-roam-server-export-inline-images t
+	org-roam-server-files nil
+	org-roam-server-served-file-extensions '("pdf" "md" "tex" "bib")
+	org-roam-server-network-poll t
+	org-roam-server-network-arrows nil
+	org-roam-server-network-label-truncate t
+	org-roam-server-label-truncate-length 60
+	org-roam-server-network-label-wrap-length 20))
+
+(sakura/leader-key-def
+  "nrv" '(org-roam-server-mode :which-key "visualize roam"))
+#+end_src
+
 *** Org-Roam-BibTeX
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-roam-bibtex
@@ -593,6 +688,12 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 #+END_SRC
 
 ** Programming
+*** General Configuration
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package smartparens)
+(require 'smartparens-config)
+#+end_src
+
 *** Markdown
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package markdown-mode
@@ -632,23 +733,165 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 *** Rust
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package rust-mode)
+(use-package cargo)
+(add-hook 'rust-mode-hook 'cargo-minor-mode)
+(add-hook 'rust-mode-hook
+	  (lambda ()
+	    (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+(use-package racer
+  :config
+  (setq racer-cmd "~/.cargo/bin/racer/")
+  (setq racer-rust-src-path "~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/"))
+
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'rust-mode-hook #'smartparens-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+(add-hook 'racer-mode-hook #'company-mode)
+
+(use-package flycheck-rust)
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 #+END_SRC
 
 * Theming
 ** Doom Themes
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
+(setq custom-theme-load-path '("~/.emacs.d/themes/"))
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
-  (load-theme 'doom-gruvbox t)
+  (load-theme 'doom-sakura-light t)
   (doom-themes-visual-bell-config))
 #+END_SRC
 
 ** Light Theme
-#+BEGIN_SRC emacs-lisp :tanlge "./init.el"
+*** Theme Definitions
+#+BEGIN_SRC emacs-lisp :tangle "./themes/doom-sakura-light-theme.el"
+(require 'doom-themes)
 
+(defgroup doom-sakura-light-theme nil
+  "Options for doom-themes"
+  :group 'doom-themes)
+
+(def-doom-theme doom-sakura-light
+  "A pleasant light theme, soft as a cherry blossom."
+
+  ;; name           default     256         16
+  ( (bg           '("#FBF7EF"   "#FBF7EF"   "white"))
+    (bg-alt       '("#FBF7EF"   "#FBF7EF"   "white"))
+    (base0        '("#363636"   "#363636"   "black"))
+    (base1        '("#414141"   "#414141"   nil))
+    (base2        '("#BF9B9F"   "#BF9B9F"   nil))
+    (base3        '("#ebe6ea"   "#EBE6EA"   nil)) ;; block highlights
+    (base4        '("#C9678D"   "#C9678D"   nil))
+    (base5        '("#ECA7D5"   "#ECA7D5"   nil))
+    (base6        '("#C9678D"   "#C9678D"   nil))
+    (base7        '("#E7CEEE"   "#E7CEEE"   nil))
+    (base8        '("#E2D8F5"   "#E2D8F5"   nil))
+    (fg           '("#2A2A2A"   "#2A2A2A"   nil))
+    (fg-alt       '("#2A2A2A"   "#2A2A2A"   nil))
+
+    (grey base6)
+    (red          '("#BE3445"   "#BE3445"   nil))
+    (orange       '("#D36745"   "#D36745"   nil))     
+    (green        '("#AAC275"   "#BE3445"   nil))
+    (yellow       '("#E1B967"   "#E1B967"   nil))
+    (magenta      '("#CE67CF"   "#CE67CF"   nil))
+
+    (teal         '("#29838D"   "#29838D"   nil))
+    (blue         '("#3B6EA8"   "#3B6EA8"   nil))
+    (dark-blue    '("#5272AF"   "#5272AF"   nil))
+    (violet       '("#842879"   "#842879"   nil))
+    (cyan         '("#398EAC"   "#398EAC"   nil))
+    (dark-cyan    '("#2C7088"   "#2C7088"   nil))
+
+    ;; face categories -- required for all themes
+    (highlight          (doom-blend blue bg 0.8))
+    (vertical-bar       (doom-darken bg 0.15))
+    (selection          (doom-blend blue bg 0.5))
+    (builtin            teal)
+    (comments           (doom-darken base5 0.2))
+    (doc-comments       (doom-darken base5 0.25))
+    (constants          magenta)
+    (functions          teal)
+    (keywords           blue)
+    (methods            teal)
+    (operators          blue)
+    (type               yellow)
+    (strings            green)
+    (variables          violet)
+    (numbers            magenta)
+    (region             base4)
+    (error              red)
+    (warning            yellow)
+    (success            green)
+    (vc-modified        orange)
+    (vc-added           green)
+    (vc-deleted         red)
+    (hl-line            base6)
+    (cursor-color       '("#000000"))
+    (+evil--default-cursor-color '("#000000"))
+    (modeline-fg        nil)))
+
+(defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
+  "On each blink the cursor will cycle to the next color in this list.")
+
+(setq blink-cursor-count 0)
+(defun blink-cursor-timer-function ()
+  "Zarza wrote this cyberpunk variant of timer `blink-cursor-timer'. 
+Warning: overwrites original version in `frame.el'.
+
+This one changes the cursor color on each blink. Define colors in `blink-cursor-colors'."
+  (when (not (internal-show-cursor-p))
+    (when (>= blink-cursor-count (length blink-cursor-colors))
+      (setq blink-cursor-count 0))
+    (set-cursor-color (nth blink-cursor-count blink-cursor-colors))
+    (setq blink-cursor-count (+ 1 blink-cursor-count))
+    )
+  (internal-show-cursor nil (not (internal-show-cursor-p))))
 #+END_SRC
+
+*** Font Tweaks
+#+begin_src emacs-lisp :tangle "./init.el"
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+
+(custom-theme-set-faces
+ 'user
+  `(org-document-info-keyword ((t :foreground "#9F9F9F")))
+
+  `(org-level-1 ((t :foreground "#2a2a2a" :weight bold)))
+  `(org-level-2 ((t :foreground "#2a2a2a" :weight bold)))
+  `(org-level-3 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-4 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-5 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-6 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-7 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-8 ((t :foreground "#2a2a2a" :weight normal)))
+  `(org-level-9 ((t :foreground "#2a2a2a" :weight normal)))
+
+  `(org-block            ((t :inherit 'fixed-pitch)))
+  `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
+  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
+  `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
+
+  `(org-table            ((t :background "#FBF7EF")))
+  `(org-formula          ((t :background "#FBF7EF")))
+  `(org-ref-cite-face    ((t :foreground "#BE3445")))
+  `(org-drawer           ((t :foreground "#9F9F9F")))
+
+  `(ivy-current-match    ((t :foreground "#2A2A2A"))))
+
+#+end_src
+
+*** Other Tweaks
+#+begin_src emacs-lisp :tangle "./init.el"
+(set-frame-parameter (selected-frame) 'alpha '(85 85))
+(add-to-list 'default-frame-alist '(alpha 85 85))
+#+end_src
 
 ** Dark Theme
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"

@@ -1,17 +1,3 @@
-#+TITLE:  Sakura Emacs Configuration
-#+AUTHOR: Jonathan Crum
-#+EMAIL:  crumja@uga.edu
-
-* Introduction
-This document is my personal emacs configuration, written in a [[http://www.orgmode.org][literate style]] to be easier to navigate and explore. Where possible (i.e. where I remember to do so), I include links to documents or configurations that I took inspiration (i.e. unabashedly stole) from.
-
-* General Configuration
-These are settings that affect the entire workflow experience in emacs. This includes package management with =use-package=, the keybinding minibuffer with =which-key=, leader bindings with =general=, and so forth.
-
-** Startup
-I want to set a few initial options to provide a clean slate to work with.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq inhibit-startup-message t)
 (setq visible-bell t)
 (setq-default fill-column 80)
@@ -22,38 +8,18 @@ I want to set a few initial options to provide a clean slate to work with.
 (menu-bar-mode -1)
 
 (set-fringe-mode 10)
-#+END_SRC
 
-** Custom File
-I definitely don't want to have a bunch of auto-generated code in my config file. Yuck.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
-#+END_SRC
 
-** Basic Information
-A little bit of information about me.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq user-full-name "Jonathan Crum")
 (setq user-mail-address "crumja@uga.edu")
-#+END_SRC
 
-** Path Constants
-I use these paths throughout my workflow.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq NOTEBOOK (concat (getenv "HOME") "/Notebook"))
 (setq BIBLIOGRAPHY (concat (getenv "HOME") "/texmf/bibtex/bib/master.bib"))
 (setq LIBRARY (concat (getenv "HOME") "/Dropbox/Library"))
 (setq WORKSPACE (concat (getenv "HOME") "/Workspace"))
-#+END_SRC
 
-** Package Management
-Sakura uses =use-package= to handle downloading and configuring other packages. By default, emacs checks for the presence of =use-package= on launch and, on finding it, downloads and installs whatever it finds.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (require 'package)  ; Initialize package sources
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -67,34 +33,15 @@ Sakura uses =use-package= to handle downloading and configuring other packages. 
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure t)
-#+END_SRC
 
-** Load Path
-I'll likely want to add custom elisp later on, so let's set that up now.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (push "~/.emacs.d/elisp" load-path)
-#+END_SRC
 
-** Keybinding Tools
-These packages make keybinding management a looot easier.
-
-*** ESC Cancels All
-Very handle little binding to make canceling inputs easier.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-#+END_SRC
 
-*** Undo-Tree
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package undo-tree)
 (require 'undo-tree)
 (global-undo-tree-mode)
-#+END_SRC
 
-*** Let's get... Evil
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -117,19 +64,13 @@ Very handle little binding to make canceling inputs easier.
   (evil-collection-outline-bind-tab-p nil)
   :config
   (evil-collection-init))
-#+END_SRC
 
-*** Keybinding Panel (which-key)
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package which-key
   :init (which-key-mode)
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0))	; controls how quickly which-key pops up
-#+END_SRC
 
-*** Simplify Leader Bindings (general)
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package general
   :config
   (general-evil-setup t)
@@ -139,37 +80,25 @@ Very handle little binding to make canceling inputs easier.
 			  :global-prefix "C-SPC")
   (general-create-definer sakura/ctrl-c-keys
 			  :prefix "C-c"))
-#+END_SRC
 
-** Toggles
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def 
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme"))
-#+END_SRC
 
-** Dashboard
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package page-break-lines)
 (use-package all-the-icons)
 (use-package dashboard
   :ensure t
   :config
   (dashboard-setup-startup-hook))
-#+END_SRC
 
-** Line and Column Numbers
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (dolist (mode '(org-mode-hook
-		eshell-mode-hook))
+		eshell-mode-hook
+		pdf-view-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
-#+END_SRC
 
-** Font Configuration
-*** Face Definitions
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (set-face-attribute 'default nil 
 		    :font "Fira Code Retina"
 		    :height 120)
@@ -182,42 +111,22 @@ Very handle little binding to make canceling inputs easier.
 ;		    :font "ETBembo"
 ;		    :height 160
 ;		    :weight 'regular)
-#+END_SRC
 
-*** Highlight Matching Braces
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
 
-** Modeline
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
-#+END_SRC
 
-** EShell Toggle
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package eshell-toggle
   :bind ("C-`" . eshell-toggle)
   :custom
   (eshell-toggle-size-fraction 3)
   (eshell-toggle-use-projectile-root t)
   (eshell-toggle-run-command nil))
-#+END_SRC
 
-** File Browsing
-*** Better Completions with Ivy
-I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. Here are some workflow notes that have helped me:
-
-- While in an Ivy minibuffer, you can search within the current results by using =S-Space=.
-- To quickly jump to an item in the minibuffer, use =C-'= to get Avy line jump keys.
-- To see actions for the selected minibuffer item, use =M-o= and then press the action's key.
-- Use =C-c C-o= to open =ivy-occur= which opens the search results within a separate buffer. From there you can click any item to perform the ivy action.
-
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package ivy
   :diminish			; suppresses minor mode on modeline
   :bind (("C-s" . swiper)	; allows fuzzy searching within current buffer
@@ -246,19 +155,12 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history)))
-#+END_SRC
 
-** Window Management
-*** Window Selection (ace-window)
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package ace-window
   :bind (("M-o" . ace-window))
   :config
   (setq aw-keys '(?h ?j ?k ?l)))
-#+END_SRC
 
-*** Keybindings
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def 
   "w" '(:ignore t :which-key "windows")
   "w-" 'split-window-vertically
@@ -268,28 +170,18 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 (sakura/leader-key-def
   "o" '(:ignore t :which-key "open")
   "of" 'make-frame)
-#+END_SRC
 
-** Buffer Management
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def
   "b" '(:ignore t :which-key "buffer")
   "bb" '(switch-to-buffer :which-key "switch-to-buffer")
   "bd" '(kill-buffer :which-key "kill-buffer"))
-#+END_SRC
-** Bookmarks
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
+
 (sakura/leader-key-def
   "C-m" '(:ignore t :which-key "bookmarks")
   "C-m n" '(bookmark-set :which-key "bookmark-set")
   "C-m d" '(bookmark-delete :which-key "bookmark-delete")
   "C-m C-m" '(bookmark-bmenu-list :which-key "bookmark-list"))
-#+END_SRC
-* Package Configuration
-** General
-*** Version Control (magit)
-*** Project Management (projectile)
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
+
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -305,11 +197,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 
 (sakura/leader-key-def
   "p" '(:ignore t :which-key "projectile"))
-#+END_SRC
 
-*** Org-Mode
-**** General Configuration
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun sakura/org-mode-setup ()
   (org-indent-mode)
   (auto-fill-mode 0)
@@ -350,10 +238,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-#+END_SRC
 
-**** Font Tweaks
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (require 'org-indent)
 
 (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -385,20 +270,11 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   `(org-formula          ((t :background "#272727")))
   `(org-ref-cite-face    ((t :foreground "#BE3445")))
   `(org-drawer           ((t :foreground "#9F9F9F"))))
-#+END_SRC
 
-**** Org-Agenda
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 
-#+END_SRC
 
-**** Org-Capture
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 
-#+END_SRC
 
-**** Org-Journal
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun sakura/org-path (path)
   (expand-file-name path org-directory))
 
@@ -430,18 +306,11 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 (sakura/leader-key-def
   "j" '(:ignore t :which-key "journal")
   "jj" '(org-journal-new-entry :which-key "new entry"))
-#+END_SRC
 
-** Research
-*** Notebook Keybinding
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def
   "n" '(:ignore t :which-key "notebook")
   "nb" '(:ignore t :which-key "bibtex"))
-#+END_SRC
 
-*** Helm-BibTeX
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package helm-bibtex
   :defer t
   :config 
@@ -470,10 +339,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
          ":DOI: ${doi}\n"
          ":URL: ${url}\n"
          ":END:")))
-#+END_SRC
 
-*** Helm-Swoop
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package helm-swoop)
 
 (sakura/leader-key-def
@@ -485,10 +351,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "sc" '(helm-multi-swoop-current-mode :which-key "swoop same as current"))
 
 ;; Note: I need to figure out how to make C-j and C-k work in the occur buffer.
-#+END_SRC
 
-*** Org-Noter
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-noter
   :after (:any org pdf-view)
   :config
@@ -502,10 +365,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "nnn" '(org-noter :which-key "org-noter")
   "nni" '(org-noter-insert-note :which-key "insert note")
   "nnI" '(org-noter-insert-precise-note :which-key "insert note precise"))
-#+END_SRC
 
-*** Org-Ref
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-ref
   :after (:any org org-noter org-roam)
   :config
@@ -527,10 +387,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 (sakura/leader-key-def
   "nbb" '(helm-bibtex :which-key "helm-bibtex")
   "nbn" '(helm-bibtex-with-notes :which-key "helm-bibtex-with-notes"))
-#+END_SRC
 
-*** Org-Roam
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-roam
   :ensure t
   :hook (after-init . org-roam-mode)
@@ -544,10 +401,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "nrg" '(org-roam-graph-show :which-key "org-roam-graph-show")
   "nri" '(org-roam-insert :which-key "org-roam-insert")
   "nrI" '(org-roam-insert-immediate :which-key "org-roam-insert-immediate"))
-#+END_SRC
 
-*** Org-Roam-BibTeX
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package org-roam-bibtex
   :after (org-roam)
   :hook (org-roam-mode . org-roam-bibtex-mode)
@@ -569,10 +423,7 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 
 (sakura/leader-key-def
   "nba" '(orb-note-actions :which-key "orb-note-actions"))
-#+END_SRC
 
-*** PDF-Tools
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package pdf-tools
   :if (display-graphic-p)
   :mode ("\\.pdf$" . pdf-view-mode)
@@ -581,28 +432,18 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width)
   (add-hook 'pdf-view-mode-hook (lambda () (cua-mode 0))))
-#+END_SRC
 
-*** Powerthesaurus
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package powerthesaurus)
 
 (sakura/leader-key-def
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
-#+END_SRC
 
-** Programming
-*** Markdown
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package markdown-mode
   :pin melpa-stable
   :mode "\\.md\\'"
   :config
   (setq markdown-command "marked"))
-#+END_SRC
 
-*** Python
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package elpy
   :ensure t
   :init
@@ -626,40 +467,14 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 (use-package company-quickhelp
   :config
   (company-quickhelp-mode))
-#+END_SRC
 
-*** Rust
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package rust-mode)
-#+END_SRC
 
-* Theming
-** Doom Themes
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
   (load-theme 'doom-gruvbox t)
   (doom-themes-visual-bell-config))
-#+END_SRC
-
-** Light Theme
-#+BEGIN_SRC emacs-lisp :tanlge "./init.el"
-
-#+END_SRC
-
-** Dark Theme
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
-#+END_SRC
-
-* Inspirations
-- [[https://github.com/howardabrams/dot-files][Howard Abrams]]
-- [[https://github.com/daedreth/UncleDavesEmacs/blob/master/config.org][Uncle Daves Emacs]]
-- [[https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org][Dakrone]]
-- [[https://github.com/jinnovation/dotemacs][Jinnovation]]
-- [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org][Daviwil]]
-- [[https://writequit.org/org/][Writequit]]
-- [[https://doc.rix.si/cce/cce.html][Complete Computing Environment]]
 
 
