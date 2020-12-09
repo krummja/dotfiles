@@ -111,13 +111,6 @@
 
 (column-number-mode)
 (global-display-line-numbers-mode -1)
-;; (dolist (mode '(org-mode-hook
-;; 		eshell-mode-hook
-;; 		pdf-view-mode-hook
-;; 		neotree-mode
-;; 		org-agenda
-;; 		org-agenda-mode))
-;;   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil 
 		    :font "Fira Code Retina"
@@ -290,10 +283,12 @@
   "lI" '(org-insert-all-links :which-key "org-insert-all-links"))
 
 (setq org-agenda-files '("~/Notebook"))
-(setq org-agenda-format-date (lambda (date) (concat "\n"
-						    (make-string (window-width) 9472)
-						    "\n"
-						    (org-agenda-format-date-aligned date))))
+(setq org-agenda-format-date 
+      (lambda (date) (concat "\n"
+			     (make-string (window-width) 9472)
+			     "\n"
+			     (org-agenda-format-date-aligned date))))
+
 (setq org-agenda-custom-commands
       '(("c" "Simple agenda view"
 	 ((tags "PRIORITY=\"A\""
@@ -306,7 +301,7 @@
 						(sakura/org-skip-subtree-if-priority ?A)
 						(org-agenda-skip-if nil '(scheduled deadline))))
 		    (org-agenda-overridding-header "\n\nALL normal priority tasks:"))))
-	 ((org-agenda-block-separator "-")))))
+	 ((org-agenda-block-separator "------------------------------------------")))))
 
 (defun sakura/org-skip-subtree-if-priority (priority)
   "Skip an agenda subtree if it has a priority of PRIORITY.
@@ -518,6 +513,15 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 
 (sakura/leader-key-def
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
+
+(use-package zotxt
+  :hook (after-init . org-zotxt-mode))
+(sakura/leader-key-def
+  "z"   '(:ignore t :which-key "zotero")
+  "zi"  '(org-zotxt-insert-reference-link :which-key "insert reference")
+  "zo"  '(org-zotxt-open-attachment :which-key "open attachment")
+  "zu"  '(org-zotxt-update-reference-link-at-point :which-key "update reference")
+  "zn"  '(org-zotxt-noter :which-key "take notes"))
 
 (use-package smartparens)
 (require 'smartparens-config)

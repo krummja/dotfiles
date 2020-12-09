@@ -189,3 +189,7 @@ export PLANTUML_LIMIT_SIZE=60000
 export EDITOR="vim"
 export PYTHONPATH="/usr/bin/python3"
 export PYTHONPATH="$HOME/Workspace/Python/:$PYTHONPATH"
+
+export PLANTUML_JAR="/usr/share/plantuml/plantuml.jar"
+
+export LD_LIBRARY_PATH="/usr/local/lib/python3.8/dist-packages/PyQt5"

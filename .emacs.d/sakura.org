@@ -182,13 +182,6 @@ Very handle little binding to make canceling inputs easier.
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (column-number-mode)
 (global-display-line-numbers-mode -1)
-;; (dolist (mode '(org-mode-hook
-;; 		eshell-mode-hook
-;; 		pdf-view-mode-hook
-;; 		neotree-mode
-;; 		org-agenda
-;; 		org-agenda-mode))
-;;   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
 ** Font Configuration
@@ -415,12 +408,18 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 #+END_SRC
 
 **** Org-Agenda
+***** Basic Setup
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq org-agenda-files '("~/Notebook"))
-(setq org-agenda-format-date (lambda (date) (concat "\n"
-						    (make-string (window-width) 9472)
-						    "\n"
-						    (org-agenda-format-date-aligned date))))
+(setq org-agenda-format-date 
+      (lambda (date) (concat "\n"
+			     (make-string (window-width) 9472)
+			     "\n"
+			     (org-agenda-format-date-aligned date))))
+#+END_SRC
+
+***** Agenda Views
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (setq org-agenda-custom-commands
       '(("c" "Simple agenda view"
 	 ((tags "PRIORITY=\"A\""
@@ -433,8 +432,11 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
 						(sakura/org-skip-subtree-if-priority ?A)
 						(org-agenda-skip-if nil '(scheduled deadline))))
 		    (org-agenda-overridding-header "\n\nALL normal priority tasks:"))))
-	 ((org-agenda-block-separator "-")))))
+	 ((org-agenda-block-separator "------------------------------------------")))))
+#+END_SRC
 
+***** Custom Function Definitions
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun sakura/org-skip-subtree-if-priority (priority)
   "Skip an agenda subtree if it has a priority of PRIORITY.
 
@@ -452,7 +454,10 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
     (if (string= (org-entry-get nil "STYLE") "habit")
 	subtree-end
       nil)))
+#+END_SRC
 
+***** Keybindings
+#+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (sakura/leader-key-def
   "na" '(org-agenda :which-key "agenda"))
 #+END_SRC
@@ -686,6 +691,18 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 (sakura/leader-key-def
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
 #+END_SRC
+
+*** Zotxt
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package zotxt
+  :hook (after-init . org-zotxt-mode))
+(sakura/leader-key-def
+  "z"   '(:ignore t :which-key "zotero")
+  "zi"  '(org-zotxt-insert-reference-link :which-key "insert reference")
+  "zo"  '(org-zotxt-open-attachment :which-key "open attachment")
+  "zu"  '(org-zotxt-update-reference-link-at-point :which-key "update reference")
+  "zn"  '(org-zotxt-noter :which-key "take notes"))
+#+end_src
 
 ** Programming
 *** General Configuration

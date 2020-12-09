@@ -150,7 +150,7 @@ bindsym $mod+Shift+Tab workspace prev
 bindsym $mod+$alt+Left workspace prev
 
 ## Navigate // Scratchpad // <><Ctrl> a ##
-bindsym $mod+Ctrl+a scratchpad show
+bindsym $mod+` scratchpad show
 
 ###############################################################################
 # Window and Workspace Configuration
@@ -184,7 +184,7 @@ bindsym $mod+f fullscreen toggle
 bindsym $mod+Shift+f floating toggle
 
 ## Modify // Move to Scratchpad // <><Ctrl> m ##
-bindsym $mod+Ctrl+m move to scratchpad
+bindsym $mod+Ctrl+` move to scratchpad
 
 ## Modify // Tile/Float Focus Toggle // <><Shift> t ##
 bindsym $mod+Shift+t focus mode_toggle
@@ -240,6 +240,7 @@ bindsym $mod+$alt+Ctrl+9 move container to workspace number $ws19; workspace num
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+# Edge Border Mode
 hide_edge_borders smart
 
 ###############################################################################
@@ -500,7 +501,9 @@ bar {
 # Set windows to float
 ###############################################################################
 
-for_window [title="Simulacra"] floating enable
+assign [class="python3.8" title="Simulacra"] $ws10
+for_window [class="python3.8" title="Simulacra"] floating enable
+
 for_window [class="org.jabref.JabRefMain" instance="org.jabref.JabRefMain" title="^(?!Jabref$)"] floating enable
 
 ###############################################################################

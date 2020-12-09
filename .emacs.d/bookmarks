@@ -4,9 +4,9 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-refile-last-stored"
  (filename . "~/Notebook/org-linkz/Linkz.org")
- (front-context-string . "** [[https://git")
- (rear-context-string . "-10 Tue 15:56]\n\n")
- (position . 2145))
+ (front-context-string . "*** [[http://gre")
+ (rear-context-string . "2-03 Thu 12:12]\n")
+ (position . 1746))
 ("Linkz"
  (filename . "~/Notebook/org-linkz/Linkz.org")
  (front-context-string . "* INBOX\n** [[htt")
@@ -19,9 +19,9 @@
  (position . 1))
 ("org-capture-last-stored"
  (filename . "~/Notebook/org-linkz/Linkz.org")
- (front-context-string . "** [[https://ema")
- (rear-context-string . "1-26 Thu 13:33]\n")
- (position . 461))
+ (front-context-string . "** [[http://soli")
+ (rear-context-string . "2-07 Mon 22:36]\n")
+ (position . 678))
 ("Sakura Configuration"
  (filename . "~/.emacs.d/sakura.org")
  (front-context-string . "** Modeline\n#+BE")
