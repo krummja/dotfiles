@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("org-refile-last-stored"
+(("Simulacrum.space"
+ (filename . "~/krummja.github.io/index.org")
+ (front-context-string)
+ (rear-context-string . "my personal blog")
+ (position . 84))
+("org-refile-last-stored"
  (filename . "~/Notebook/org-linkz/Linkz.org")
  (front-context-string . "*** [[http://gre")
  (rear-context-string . "2-03 Thu 12:12]\n")
@@ -19,9 +24,9 @@
  (position . 1))
 ("org-capture-last-stored"
  (filename . "~/Notebook/org-linkz/Linkz.org")
- (front-context-string . "** [[http://soli")
- (rear-context-string . "2-07 Mon 22:36]\n")
- (position . 678))
+ (front-context-string . "** [[https://joa")
+ (rear-context-string . "2-10 Thu 10:56]\n")
+ (position . 1494))
 ("Sakura Configuration"
  (filename . "~/.emacs.d/sakura.org")
  (front-context-string . "** Modeline\n#+BE")

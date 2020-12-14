@@ -182,6 +182,7 @@ Very handle little binding to make canceling inputs easier.
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (column-number-mode)
 (global-display-line-numbers-mode -1)
+(add-hook 'prog-mode-hook 'linum-mode)
 #+END_SRC
 
 ** Font Configuration
@@ -206,6 +207,11 @@ Very handle little binding to make canceling inputs easier.
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
+
+*** Highlight Hexadecimal Color Strings
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package rainbow-mode)
+#+end_src
 
 ** Modeline
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
@@ -382,6 +388,21 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-use-outline-path t)
 
+  (setq org-todo-keywords
+	'((sequence "TODO" "DOING" "PAUSED" "|" "DONE" "CANCELLED")
+	  (sequence "NOTE" "PROJECT" "|" "TO ARCHIVE")))
+
+  (setq org-capture-templates
+	'(("n" "Note" entry (file+headline "~/Notebook/index.org" "INBOX")
+	   "* NOTE  %?\n" :empty-lines 1)
+	  ("b" "Bib Entry" entry (file+headline "~/Notebook/bibliography.org" "UNSORTED")
+	   "*  %?\n" :empty-lines 1)
+	  ("o" "Link capture" entry
+	   (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
+	   "* %a %U"
+	   :immediate-finish t)))
+
+  (setq org-protocol-default-template-key "o")
   (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
   (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
 
@@ -404,7 +425,9 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   "l" '(:ignore t :which-key "links")
   "ll" '(org-store-link :which-key "org-store-link")
   "li" '(org-insert-link :which-key "org-insert-link")
-  "lI" '(org-insert-all-links :which-key "org-insert-all-links"))
+  "lI" '(org-insert-all-links :which-key "org-insert-all-links")
+  "c"  '(:ignore t :which-key "capture")
+  "cc" '(org-capture :which-key "org-capture"))
 #+END_SRC
 
 **** Org-Agenda
@@ -462,11 +485,6 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
   "na" '(org-agenda :which-key "agenda"))
 #+END_SRC
 
-**** Org-Capture
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
-
-#+END_SRC
-
 **** Org-Journal
 #+BEGIN_SRC emacs-lisp :tangle "./init.el"
 (defun sakura/org-path (path)
@@ -506,12 +524,14 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 #+begin_src emacs-lisp :tangle "./init.el"
 (setq org-html-validation-link nil)
 (require 'org-protocol)
-(setq org-capture-templates
-      '(("o" "Link capture" entry
-	 (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
-	 "* %a %U"
-	 :immediate-finish t)))
-(setq org-protocol-default-template-key "o")
+#+end_src
+
+*** Yasnippet
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package yasnippet
+  :ensure t)
+(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+(yas-global-mode 1)
 #+end_src
 
 ** Research
@@ -692,6 +712,17 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
 #+END_SRC
 
+*** Writeroom-Mode
+#+begin_src emacs-lisp :tangle "./init.el"
+(use-package writeroom-mode)
+(setq writeroom-width 120)
+
+(sakura/leader-key-def
+  "tw" '(writeroom-mode :which-key "writeroom"))
+#+end_src
+
+#+RESULTS:
+
 *** Zotxt
 #+begin_src emacs-lisp :tangle "./init.el"
 (use-package zotxt
@@ -708,6 +739,7 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 *** General Configuration
 #+begin_src emacs-lisp :tangle "./init.el"
 (use-package smartparens)
+(smartparens-global-mode t)
 (require 'smartparens-config)
 #+end_src
 
@@ -717,7 +749,8 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
   :pin melpa-stable
   :mode "\\.md\\'"
   :config
-  (setq markdown-command "marked"))
+  (setq markdown-command "marked")
+  (visual-line-mode 1))
 #+END_SRC
 
 *** Python
@@ -811,8 +844,8 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
     (grey base6)
     (red          '("#BE3445"   "#BE3445"   nil))
     (orange       '("#D36745"   "#D36745"   nil))     
-    (green        '("#AAC275"   "#BE3445"   nil))
-    (yellow       '("#E1B967"   "#E1B967"   nil))
+    (green        '("#768E42"   "#BE3445"   nil))
+    (yellow       '("#C38913"   "#E1B967"   nil))
     (magenta      '("#CE67CF"   "#CE67CF"   nil))
 
     (teal         '("#29838D"   "#29838D"   nil))
@@ -845,7 +878,7 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
     (vc-modified        orange)
     (vc-added           green)
     (vc-deleted         red)
-    (hl-line            base6)
+    (hl-line            (doom-blend base6 bg 0.6))
     (cursor-color       '("#000000"))
     (+evil--default-cursor-color '("#000000"))
     (modeline-fg        nil)))
@@ -870,6 +903,8 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
 
 *** Font Tweaks
 #+begin_src emacs-lisp :tangle "./init.el"
+;; TODO: I'll need to make these theme-specific somehow...
+
 (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
 (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
 (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
@@ -910,9 +945,109 @@ This one changes the cursor color on each blink. Define colors in `blink-cursor-
 (add-to-list 'default-frame-alist '(alpha 85 85))
 #+end_src
 
+*** Python Font-Lock Adjustments
+#+begin_src emacs-lisp :tangle "./init.el"
+(defvar font-lock-operator-face 'font-lock-operator-face)
+
+(defface font-lock-operator-face
+  '((((type tty) (class color)) nil)
+    (((class color) (background light))
+     (:foreground "dark red"))
+    (t nil))
+  "Used for operators."
+  :group 'font-lock-faces)
+
+(defvar font-lock-operator-keywords
+  '(("\\([][|!.+=&/%*,<>(){}:^~-]+\\)" 1 font-lock-operator-face)))
+
+(add-hook 'python-mode-hook 
+	  '(lambda ()
+	     (font-lock-add-keywords nil font-lock-operator-keywords t))
+	  t t)
+#+end_src
+
 ** Dark Theme
-#+BEGIN_SRC emacs-lisp :tangle "./init.el"
-#+END_SRC
+*** Theme Definitions
+#+begin_src emacs-lisp :tangle "./themes/doom-sakura-dark-theme.el"
+(defgroup doom-sakura-dark-theme nil
+  "Options for doom themes."
+  :group 'doom-themes)
+
+(def-doom-theme doom-sakura-dark
+  "A soothing dark theme, tranquil as a spring breeze."
+
+  ;; name           default     256          16
+  ( (bg           '("#2A2A2A"   "#FBF7EF"    nil))
+    (bg-alt       '("#2A2A2A"   "#FBF7EF"    nil))
+    (base0        '("#E2D8F5"   "#363636"   "black"))
+    (base1        '("#E7CEEE"   "#414141"   nil))
+    (base2        '("#C9678D"   "#BF9B9F"   nil))
+    (base3        '("#ECA7D5"   "#EBE6EA"   nil)) ;; block highlights
+    (base4        '("#C9678D"   "#C9678D"   nil))
+    (base5        '("#EBE6EA"   "#ECA7D5"   nil))
+    (base6        '("#BF9B9F"   "#C9678D"   nil))
+    (base7        '("#414141"   "#E7CEEE"   nil))
+    (base8        '("#363636"   "#E2D8F5"   nil))
+    (fg           '("#FBF7EF"   "#2A2A2A"   nil))
+    (fg-alt       '("#FBF7EF"   "#2A2A2A"   nil))
+
+    (grey base6)
+    (red          '("#BE3445"   "#BE3445"   nil))
+    (orange       '("#D36745"   "#D36745"   nil))     
+    (green        '("#768E42"   "#BE3445"   nil))
+    (yellow       '("#C38913"   "#E1B967"   nil))
+    (magenta      '("#CE67CF"   "#CE67CF"   nil))
+
+    (teal         '("#29838D"   "#29838D"   nil))
+    (blue         '("#3B6EA8"   "#3B6EA8"   nil))
+    (dark-blue    '("#5272AF"   "#5272AF"   nil))
+    (violet       '("#842879"   "#842879"   nil))
+    (cyan         '("#398EAC"   "#398EAC"   nil))
+    (dark-cyan    '("#2C7088"   "#2C7088"   nil))
+
+    ;; face categories -- required for all themes
+    (highlight          (doom-blend blue bg 0.8))
+    (vertical-bar       (doom-darken bg 0.15))
+    (selection          (doom-blend blue bg 0.5))
+    (builtin            teal)
+    (comments           (doom-darken base5 0.2))
+    (doc-comments       (doom-darken base5 0.25))
+    (constants          magenta)
+    (functions          teal)
+    (keywords           blue)
+    (methods            teal)
+    (operators          blue)
+    (type               yellow)
+    (strings            green)
+    (variables          violet)
+    (numbers            magenta)
+    (region             base4)
+    (error              red)
+    (warning            yellow)
+    (success            green)
+    (vc-modified        orange)
+    (vc-added           green)
+    (vc-deleted         red)
+    (hl-line            (doom-blend base6 bg 0.6))
+    (cursor-color       '("#FFFFFF"))
+    (+evil--default-cursor-color '("#FFFFFF"))
+    (modeline-fg        nil)))
+#+end_src
+
+*** Font Tweaks
+*** Other Tweaks
+
+** Theme Toggle Function
+#+begin_src emacs-lisp "./init.el"
+(defun sakura/toggle-theme)
+#+end_src
+
+* Other Stuff
+** MUSH
+#+begin_src emacs-lisp :tangle "./init.el"
+(load "mu")
+(setq mu-worlds '(["Asteria" "asteriamud.com" 1111 "Aulia" "4998qpap"]))
+#+end_src
 
 * Inspirations
 - [[https://github.com/howardabrams/dot-files][Howard Abrams]]

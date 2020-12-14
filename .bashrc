@@ -2,6 +2,10 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+export LANGUAGE=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -177,6 +181,7 @@ fi
 export PATH="$HOME/.local/bin/:$PATH"
 export PATH="$HOME/dart-sdk/sdk/out/ReleaseX64/dart-sdk/bin/:$PATH"
 export PATH="$HOME/.cargo/bin/:$PATH"
+export PATH="$HOME/.gem/ruby/2.7.0/bin/:$PATH"
 
 alias wacom="sudo bash ~/.local/bin/wacom"
 
