@@ -11,7 +11,6 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (menu-bar-mode -1)
-
 (set-fringe-mode 10)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -107,10 +106,13 @@
 (use-package dashboard
   :ensure t
   :config
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (setq dashboard-banner-logo-title "W-welcome to Emacs... I suppose...")
+  (setq dashboard-startup-banner "~/.emacs.d/themes/sakura_logo.png"))
 
 (column-number-mode)
 (global-display-line-numbers-mode -1)
+(add-hook 'prog-mode-hook 'linum-mode)
 
 (set-face-attribute 'default nil 
 		    :font "Fira Code Retina"
@@ -120,13 +122,13 @@
 		    :font "Fira Code Retina"
 		    :height 120)
 
-;(set-face-attribute 'variable-pitch nil
-;		    :font "ETBembo"
-;		    :height 160
-;		    :weight 'regular)
-
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package rainbow-mode)
+
+(sakura/leader-key-def
+  "tr" 'rainbow-mode)
 
 (use-package doom-modeline
   :ensure t
@@ -221,11 +223,16 @@
   :after projectile)
 
 (sakura/leader-key-def
-  "p" '(:ignore t :which-key "projectile")
-  "pf" '(counsel-projectile-find-file :which-key "find file"))
+  "p"  '(:ignore t :which-key "projectile")
+  "pf" '(counsel-projectile-find-file :which-key "find file")
+  "pp" '(projectile-switch-project :which-key "switch project")
+  "ps" '(projectile-switch-open-project :which-key "switch open project")
+  "pt" '(projectile-find-tag :which-key "find tag"))
 
 (use-package neotree)
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(setq neo-window-fixed-size nil
+      neo-window-width 15)
 (add-hook 'neo-after-create-hook
 	  (lambda (&rest _) (display-line-numbers-mode -1)))
 
@@ -251,13 +258,29 @@
 	org-startup-folded t
 	org-cycle-separator-lines 2
 	org-directory NOTEBOOK
-	org-return-follows-link t)
+	org-return-follows-link t
+	org-support-shift-select t)
 
   (setq org-refile-targets '((nil :maxlevel . 3)
 			     (org-agenda-files :maxlevel . 3)))
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-use-outline-path t)
 
+  (setq org-todo-keywords
+	'((sequence "TODO" "DOING" "PAUSED" "|" "DONE" "CANCELLED")
+	  (sequence "NOTE" "PROJECT" "|" "TO ARCHIVE")))
+
+  (setq org-capture-templates
+	'(("n" "Note" entry (file+headline "~/Notebook/index.org" "INBOX")
+	   "* NOTE  %?\n" :empty-lines 1)
+	  ("b" "Bib Entry" entry (file+headline "~/Notebook/bibliography.org" "UNSORTED")
+	   "*  %?\n" :empty-lines 1)
+	  ("o" "Link capture" entry
+	   (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
+	   "* %a %U"
+	   :immediate-finish t)))
+
+  (setq org-protocol-default-template-key "o")
   (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
   (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
 
@@ -280,7 +303,9 @@
   "l" '(:ignore t :which-key "links")
   "ll" '(org-store-link :which-key "org-store-link")
   "li" '(org-insert-link :which-key "org-insert-link")
-  "lI" '(org-insert-all-links :which-key "org-insert-all-links"))
+  "lI" '(org-insert-all-links :which-key "org-insert-all-links")
+  "c"  '(:ignore t :which-key "capture")
+  "cc" '(org-capture :which-key "org-capture"))
 
 (setq org-agenda-files '("~/Notebook"))
 (setq org-agenda-format-date 
@@ -324,8 +349,6 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 (sakura/leader-key-def
   "na" '(org-agenda :which-key "agenda"))
 
-
-
 (defun sakura/org-path (path)
   (expand-file-name path org-directory))
 
@@ -360,12 +383,11 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 
 (setq org-html-validation-link nil)
 (require 'org-protocol)
-(setq org-capture-templates
-      '(("o" "Link capture" entry
-	 (file+headline "~/Notebook/org-linkz/Linkz.org" "INBOX")
-	 "* %a %U"
-	 :immediate-finish t)))
-(setq org-protocol-default-template-key "o")
+
+(use-package yasnippet
+  :ensure t)
+(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+(yas-global-mode 1)
 
 (use-package helm-bibtex
   :defer t
@@ -514,6 +536,12 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 (sakura/leader-key-def
   "nt" '(powerthesaurus-lookup-word-dwim :which-key "powerthesaurus"))
 
+(use-package writeroom-mode)
+(setq writeroom-width 120)
+
+(sakura/leader-key-def
+  "tw" '(writeroom-mode :which-key "writeroom"))
+
 (use-package zotxt
   :hook (after-init . org-zotxt-mode))
 (sakura/leader-key-def
@@ -524,13 +552,15 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
   "zn"  '(org-zotxt-noter :which-key "take notes"))
 
 (use-package smartparens)
+(smartparens-global-mode t)
 (require 'smartparens-config)
 
 (use-package markdown-mode
   :pin melpa-stable
   :mode "\\.md\\'"
   :config
-  (setq markdown-command "marked"))
+  (setq markdown-command "marked")
+  (visual-line-mode 1))
 
 (use-package elpy
   :ensure t
@@ -576,46 +606,145 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
 (setq custom-theme-load-path '("~/.emacs.d/themes/"))
+
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
   (load-theme 'doom-sakura-light t)
   (doom-themes-visual-bell-config))
+(require 'doom-themes)
 
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(use-package heaven-and-hell
+  :ensure t
+  :init
+  (setq heaven-and-hell-themes
+	'((light . doom-sakura-light)
+	  (dark . doom-sakura-dark)))
+  (setq heaven-and-hell-load-theme-no-confirm t)
+  :hook (after-init . heaven-and-hell-init-hook))
 
-(custom-theme-set-faces
- 'user
-  `(org-document-info-keyword ((t :foreground "#9F9F9F")))
+(sakura/leader-key-def
+  "tT" '(heaven-and-hell-toggle-theme :which-key "toggle theme"))
 
-  `(org-level-1 ((t :foreground "#2a2a2a" :weight bold)))
-  `(org-level-2 ((t :foreground "#2a2a2a" :weight bold)))
-  `(org-level-3 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-4 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-5 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-6 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-7 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-8 ((t :foreground "#2a2a2a" :weight normal)))
-  `(org-level-9 ((t :foreground "#2a2a2a" :weight normal)))
+(defvar font-lock-operator-face 'font-lock-operator-face)
 
-  `(org-block            ((t :inherit 'fixed-pitch)))
-  `(org-block-begin-line ((t :foreground "#BF9B9F" :background nil :underline "#2A2A2A")))
-  `(org-block-end-line   ((t :foreground "#BF9B9F" :background nil :underline nil :overline "#2A2A2A")))
-  `(org-verbatim         ((t :foreground "#BE3445" :background nil :weight normal)))
+(defface font-lock-operator-face
+  '((((type tty) (class color)) nil)
+    (((class color) (background light))
+     (:foreground "dark red"))
+    (t nil))
+  "Used for operators."
+  :group 'font-lock-faces)
 
-  `(org-table            ((t :background "#FBF7EF")))
-  `(org-formula          ((t :background "#FBF7EF")))
-  `(org-ref-cite-face    ((t :foreground "#BE3445")))
-  `(org-drawer           ((t :foreground "#9F9F9F")))
+(defvar font-lock-operator-keywords
+  '(("\\([][|!.+=&/%*,<>(){}:^~-]+\\)" 1 font-lock-operator-face)))
 
-  `(ivy-current-match    ((t :foreground "#2A2A2A"))))
+(add-hook 'python-mode-hook 
+	  '(lambda ()
+	     (font-lock-add-keywords nil font-lock-operator-keywords t))
+	  t t)
+
+(defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
+  "On each blink the cursor will cycle to the next color in this list.")
+
+(setq blink-cursor-count 0)
+(defun blink-cursor-timer-function ()
+  "Zarza wrote this cyberpunk variant of timer `blink-cursor-timer'. 
+Warning: overwrites original version in `frame.el'.
+
+This one changes the cursor color on each blink. Define colors in `blink-cursor-colors'."
+  (when (not (internal-show-cursor-p))
+    (when (>= blink-cursor-count (length blink-cursor-colors))
+      (setq blink-cursor-count 0))
+    (set-cursor-color (nth blink-cursor-count blink-cursor-colors))
+    (setq blink-cursor-count (+ 1 blink-cursor-count))
+    )
+  (internal-show-cursor nil (not (internal-show-cursor-p))))
 
 (set-frame-parameter (selected-frame) 'alpha '(85 85))
 (add-to-list 'default-frame-alist '(alpha 85 85))
 
+(global-tab-line-mode)
 
+(defun sakura/light-theme-tab-line ()
+  (set-face-attribute 'tab-line nil 
+		      ;; background behind tabs
+		      :background "#E2D8F5"
+		      :foreground "black" :distant-foreground "black"
+		      :family "Fira Sans Condensed" :height 1.0 :box nil)
+
+  (set-face-attribute 'tab-line-tab nil 
+		      ;; active tab in other window
+		      :inherit 'tab-line
+		      :foreground "#FBF7EF" :background "#FBF7EF" :box nil)
+
+  (set-face-attribute 'tab-line-tab-current nil 
+		      ;; active tab in current window
+		      :background "#FBF7EF" :foreground "#2A2A2A" :box nil)
+
+  (set-face-attribute 'tab-line-tab-inactive nil
+		      ;; inactive tab
+		      :background "#E2D8F5" :foreground "#5A5A5A" :box nil)
+
+  (set-face-attribute 'tab-line-highlight nil
+		      ;; mouseover
+		      :background "#ECA7D5" :foreground 'unspecified))
+
+(defun sakura/dark-theme-tab-line ()
+  (set-face-attribute 'tab-line nil 
+		      ;; background behind tabs
+		      :background "#2A2A2A"
+		      :foreground "black" :distant-foreground "black"
+		      :family "Fira Sans Condensed" :height 1.0 :box nil)
+
+  (set-face-attribute 'tab-line-tab nil 
+		      ;; active tab in other window
+		      :inherit 'tab-line
+		      :foreground "#2A2A2A" :background "#2A2A2A" :box nil)
+
+  (set-face-attribute 'tab-line-tab-current nil 
+		      ;; active tab in current window
+		      :background "#2A2A2A" :foreground "#FBF7EF" :box nil)
+
+  (set-face-attribute 'tab-line-tab-inactive nil
+		      ;; inactive tab
+		      :background "#5A5A5A" :foreground "#E2D8F5" :box nil)
+
+  (set-face-attribute 'tab-line-highlight nil
+		      ;; mouseover
+		      :background "#ECA7D5" :foreground 'unspecified))
+
+(defun sakura/tab-line-dark-theme ()
+  (global-tab-line-mode)
+  (sakura/dark-theme-tab-line)
+  (global-tab-line-mode))
+
+(defun sakura/tab-line-light-theme ()
+  (global-tab-line-mode)
+  (sakura/light-theme-tab-line)
+  (global-tab-line-mode))
+
+(sakura/tab-line-light-theme)
+
+(sakura/leader-key-def
+  "bj" '(tab-line-switch-to-prev-tab :which-key "Previous Tab")
+  "bk" '(tab-line-switch-to-next-tab :which-key "Next Tab"))
+
+(use-package powerline)
+(require 'powerline)
+(defvar sakura/tab-height 22)
+(defvar sakura/tab-left (powerline-wave-right 'tab-line nil sakura/tab-height))
+(defvar sakura/tab-right (powerline-wave-left nil 'tab-line sakura/tab-height))
+
+(defun sakura/tab-line-tab-name-buffer (buffer &optional _buffers)
+  (powerline-render (list sakura/tab-left
+			  (format " %s  " (buffer-name buffer))
+			  sakura/tab-right)))
+
+(setq tab-line-tab-name-function #'sakura/tab-line-tab-name-buffer)
+(setq tab-line-new-button-show nil)
+(setq tab-line-close-button-show nil)
+
+(load "mu")
+(setq mu-worlds '(["Asteria" "asteriamud.com" 1111 "Aulia" "4998qpap"]))

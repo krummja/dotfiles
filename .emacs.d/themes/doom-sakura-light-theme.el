@@ -1,19 +1,35 @@
-(require 'doom-themes)
-
 (defgroup doom-sakura-light-theme nil
   "Options for doom-themes"
   :group 'doom-themes)
 
-(def-doom-theme doom-sakura-light
+(defcustom doom-sakura-brighter-modeline nil
+  "If non-nil, more vivid colors will be used to style the mode-line."
+  :group 'doom-sakura-light-theme
+  :type 'boolean)
+
+
+(defcustom doom-sakura-brighter-comments nil
+  "If non-nil, comments will be highlighted in more vivid colors."
+  :group 'doom-sakura-light-theme
+  :type 'boolean)
+
+(defcustom doom-sakura-comment-bg doom-sakura-brighter-comments
+  "If non-nil, comments will have a subtler, darker background, enhancing legibility."
+  :group 'doom-sakura-light-theme
+  :type 'boolean)
+
+;; (def-doom-theme NAME DOCSTRING DEFS &optional EXTRA-FACES EXTRA-VARS)
+(def-doom-theme 
+  doom-sakura-light
   "A pleasant light theme, soft as a cherry blossom."
 
   ;; name           default     256         16
   ( (bg           '("#FBF7EF"   "#FBF7EF"   "white"))
-    (bg-alt       '("#FBF7EF"   "#FBF7EF"   "white"))
+    (bg-alt       '("#E2D8F5"   "#E2D8F5"   "white"))
     (base0        '("#363636"   "#363636"   "black"))
     (base1        '("#414141"   "#414141"   nil))
     (base2        '("#BF9B9F"   "#BF9B9F"   nil))
-    (base3        '("#ebe6ea"   "#EBE6EA"   nil)) ;; block highlights
+    (base3        '("#EBE6EA"   "#EBE6EA"   nil)) ;; block highlights
     (base4        '("#C9678D"   "#C9678D"   nil))
     (base5        '("#ECA7D5"   "#ECA7D5"   nil))
     (base6        '("#C9678D"   "#C9678D"   nil))
@@ -35,14 +51,17 @@
     (violet       '("#842879"   "#842879"   nil))
     (cyan         '("#398EAC"   "#398EAC"   nil))
     (dark-cyan    '("#2C7088"   "#2C7088"   nil))
+    (iosvkem-bg   '("#1b1d1e"   "#1b1d1e"   nil))
+    (iosvkem-bga  '("#262829"   "#262829"   nil))
+    ;; I can add arbitrarily many more definitions :o
 
     ;; face categories -- required for all themes
     (highlight          (doom-blend blue bg 0.8))
     (vertical-bar       (doom-darken bg 0.15))
     (selection          (doom-blend blue bg 0.5))
     (builtin            teal)
-    (comments           (doom-darken base5 0.2))
-    (doc-comments       (doom-darken base5 0.25))
+    (comments           (doom-darken base5 0.45))
+    (doc-comments       (doom-darken base5 0.45))
     (constants          magenta)
     (functions          teal)
     (keywords           blue)
@@ -52,31 +71,39 @@
     (strings            green)
     (variables          violet)
     (numbers            magenta)
-    (region             base4)
+    (region             `(,(doom-lighten (car bg-alt) 0.15) ,@(doom-lighten (cdr base0) 0.35)))
     (error              red)
     (warning            yellow)
     (success            green)
     (vc-modified        orange)
     (vc-added           green)
     (vc-deleted         red)
-    (hl-line            (doom-blend base6 bg 0.6))
+    (hl-line            (doom-blend base1 bg 0.3))
     (cursor-color       '("#000000"))
     (+evil--default-cursor-color '("#000000"))
-    (modeline-fg        nil)))
+    (modeline-fg        nil))
 
-(defvar blink-cursor-colors (list  "#92c48f" "#6785c5" "#be369c" "#d9ca65")
-  "On each blink the cursor will cycle to the next color in this list.")
-
-(setq blink-cursor-count 0)
-(defun blink-cursor-timer-function ()
-  "Zarza wrote this cyberpunk variant of timer `blink-cursor-timer'. 
-Warning: overwrites original version in `frame.el'.
-
-This one changes the cursor color on each blink. Define colors in `blink-cursor-colors'."
-  (when (not (internal-show-cursor-p))
-    (when (>= blink-cursor-count (length blink-cursor-colors))
-      (setq blink-cursor-count 0))
-    (set-cursor-color (nth blink-cursor-count blink-cursor-colors))
-    (setq blink-cursor-count (+ 1 blink-cursor-count))
-    )
-  (internal-show-cursor nil (not (internal-show-cursor-p))))
+  ;; EXTRA-FACES
+  (
+   ((outline-1 &override) :foreground base0 :weight 'bold)
+   ((outline-2 &override) :foreground base0 :weight 'bold)
+   ((outline-3 &override) :foreground base0 :weight 'normal)
+   ((outline-4 &override) :foreground base0 :weight 'normal)
+   ((outline-5 &override) :foreground base0 :weight 'normal)
+   ((outline-6 &override) :foreground base0 :weight 'normal)
+   ((outline-7 &override) :foreground base0 :weight 'normal)
+   ((outline-8 &override) :foreground base0 :weight 'normal)
+   ((org-block &override) :inherit 'fixed-pitch)
+   ((org-verbatim &override) :foreground red :background nil :weight 'normal)
+   ((org-table &override) :background bg)
+   ((org-formula &override) :background bg)
+   ((org-ref-cite-face &override) :foreground red)
+   ((org-drawer &override) :foreground "#9F9F9F")
+   ((org-block-begin-line &override) :foreground base2 :background nil :underline fg)
+   ((org-block-end-line &override) :foreground base2 :background nil :underline nil :overline fg)
+   ((org-document-info-keyword &override) :foreground base2)
+   ((ivy-current-match &override) :foreground fg)
+   )
+ 
+  ;; EXTRA-VARS
+  ())
