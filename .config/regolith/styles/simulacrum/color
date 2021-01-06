@@ -2,7 +2,8 @@
 #define color_base03   #FBF7EF
 #define color_base02   #FBF7EF
 #define color_base01   #BF9B9F
-#define color_base00   #ebe6ea
+! #define color_base00   #ebe6ea
+#define color_base00   #ff0000
 #define color_base0    #CE67CF
 #define color_base1    #2A2A2A
 #define color_base2    #F28779

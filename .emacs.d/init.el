@@ -122,6 +122,10 @@
 		    :font "Fira Code Retina"
 		    :height 120)
 
+(set-face-attribute 'variable-pitch nil
+		    :font "ETBembo"
+		    :height 120)
+
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
@@ -291,13 +295,16 @@
   :after org
   :hook (org-mode . org-bullets-mode)
   :custom
-  (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
+  (org-bullets-bullet-list '(" ")))
+;;  (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
 
 (require 'org-indent)
 
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
 
 (sakura/leader-key-def
   "l" '(:ignore t :which-key "links")
@@ -383,6 +390,11 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 
 (setq org-html-validation-link nil)
 (require 'org-protocol)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (dot . t)))
 
 (use-package yasnippet
   :ensure t)

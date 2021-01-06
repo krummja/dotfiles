@@ -3,7 +3,7 @@
 #+EMAIL:  crumja@uga.edu
 
 * Introduction
-This document is my personal emacs configuration, written in a [[http://www.orgmode.org][literate style]] to be easier to navigate and explore. Where possible (i.e. where I remember to do so), I include links to documents or configurations that I took inspiration (i.e. unabashedly stole) from.
+This document is my personal emacs configuration, written in a [[http://www.orgmode.org][literate style]] to be easier t navigate and explore. Where possible (i.e. where I remember to do so), I include links to documents or configurations that I took inspiration (i.e. unabashedly stole) from.
 
 * General Configuration
 These are settings that affect the entire workflow experience in emacs. This includes package management with =use-package=, the keybinding minibuffer with =which-key=, leader bindings with =general=, and so forth.
@@ -195,6 +195,10 @@ Very handle little binding to make canceling inputs easier.
 
 (set-face-attribute 'fixed-pitch nil
 		    :font "Fira Code Retina"
+		    :height 120)
+
+(set-face-attribute 'variable-pitch nil
+		    :font "ETBembo"
 		    :height 120)
 #+END_SRC
 
@@ -418,13 +422,16 @@ I use Ivy, Counsel, and Swiper to navigate around files, buffer, and projects. H
   :after org
   :hook (org-mode . org-bullets-mode)
   :custom
-  (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
+  (org-bullets-bullet-list '(" ")))
+;;  (org-bullets-bullet-list '("☰" "☷" "☵" "☲" "☳" "☴" "☶" "☱")))
 
 (require 'org-indent)
 
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
 
 (sakura/leader-key-def
   "l" '(:ignore t :which-key "links")
@@ -529,6 +536,15 @@ PRIORITY may be one of the characters ?A, ?B or ?C."
 #+begin_src emacs-lisp :tangle "./init.el"
 (setq org-html-validation-link nil)
 (require 'org-protocol)
+#+end_src
+
+*** Org-Babel
+#+begin_src emacs-lisp :tangle "./init.el" 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (dot . t)
+   (python .t)))
 #+end_src
 
 *** Yasnippet
@@ -904,9 +920,9 @@ This is my custom light theme, tailored for the aesthetics of my home computer (
     ;; I can add arbitrarily many more definitions :o
 
     ;; face categories -- required for all themes
-    (highlight          (doom-blend blue bg 0.8))
+    (highlight          (doom-blend red bg 0.95))
     (vertical-bar       (doom-darken bg 0.15))
-    (selection          (doom-blend blue bg 0.5))
+    (selection          (doom-blend base5 bg 0.75))
     (builtin            teal)
     (comments           (doom-darken base5 0.45))
     (doc-comments       (doom-darken base5 0.45))
@@ -919,40 +935,74 @@ This is my custom light theme, tailored for the aesthetics of my home computer (
     (strings            green)
     (variables          violet)
     (numbers            magenta)
-    (region             `(,(doom-lighten (car bg-alt) 0.15) ,@(doom-lighten (cdr base0) 0.35)))
+    (region             `(,(doom-lighten (car base5) 0.15) ,@(doom-lighten (cdr base0) 0.15)))
     (error              red)
     (warning            yellow)
     (success            green)
     (vc-modified        orange)
     (vc-added           green)
     (vc-deleted         red)
-    (hl-line            (doom-blend base1 bg 0.3))
+    (hl-line            (doom-blend base5 bg 0.5))
     (cursor-color       '("#000000"))
     (+evil--default-cursor-color '("#000000"))
     (modeline-fg        nil))
 
   ;; EXTRA-FACES
   (
-   ((outline-1 &override) :foreground base0 :weight 'bold)
-   ((outline-2 &override) :foreground base0 :weight 'bold)
-   ((outline-3 &override) :foreground base0 :weight 'normal)
-   ((outline-4 &override) :foreground base0 :weight 'normal)
-   ((outline-5 &override) :foreground base0 :weight 'normal)
-   ((outline-6 &override) :foreground base0 :weight 'normal)
-   ((outline-7 &override) :foreground base0 :weight 'normal)
-   ((outline-8 &override) :foreground base0 :weight 'normal)
-   ((org-block &override) :inherit 'fixed-pitch)
-   ((org-verbatim &override) :foreground red :background nil :weight 'normal)
-   ((org-table &override) :background bg)
-   ((org-formula &override) :background bg)
-   ((org-ref-cite-face &override) :foreground red)
-   ((org-drawer &override) :foreground "#9F9F9F")
-   ((org-block-begin-line &override) :foreground base2 :background nil :underline fg)
-   ((org-block-end-line &override) :foreground base2 :background nil :underline nil :overline fg)
-   ((org-document-info-keyword &override) :foreground base2)
-   ((ivy-current-match &override) :foreground fg)
-   )
- 
+   ((outline-1 &override)  :foreground base0 :weight 'bold)
+   ((outline-2 &override)  :foreground base0 :weight 'bold)
+   ((outline-3 &override)  :foreground base0 :weight 'bold)
+   ((outline-4 &override)  :foreground base0 :weight 'bold)
+   ((outline-5 &override)  :foreground base0 :weight 'bold)
+   ((outline-6 &override)  :foreground base0 :weight 'bold)
+   ((outline-7 &override)  :foreground base0 :weight 'bold)
+   ((outline-8 &override)  :foreground base0 :weight 'bold)
+
+   ((org-block &override) 
+    :inherit 'fixed-pitch)
+
+   ((org-verbatim &override) 
+    :foreground red 
+    :background nil 
+    :weight 'normal)
+
+   ((org-table &override) 
+    :background bg)
+
+   ((org-formula &override) 
+    :background bg)
+
+   ((org-ref-cite-face &override) 
+    :foreground red)
+
+   ((org-drawer &override) 
+    :foreground "#9F9F9F")
+
+   ((org-block-begin-line &override) 
+ ;;   :inherit 'fixed-pitch
+    :foreground base2 
+    :background nil 
+    :underline fg)
+
+   ((org-block-end-line &override) 
+ ;;   :inherit 'fixed-pitch
+    :foreground base2 
+    :background nil 
+    :underline nil 
+    :overline fg)
+
+   ((org-document-info-keyword &override) 
+    :foreground base2)
+
+   ((ivy-current-match &override) 
+    :foreground fg)
+   
+   ((org-link &override)
+    :foreground red
+    :background nil
+    :underline red)
+   ) 
+
   ;; EXTRA-VARS
   ())
 #+END_SRC

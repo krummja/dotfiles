@@ -56,9 +56,9 @@
     ;; I can add arbitrarily many more definitions :o
 
     ;; face categories -- required for all themes
-    (highlight          (doom-blend blue bg 0.8))
+    (highlight          (doom-blend red bg 0.95))
     (vertical-bar       (doom-darken bg 0.15))
-    (selection          (doom-blend blue bg 0.5))
+    (selection          (doom-blend base5 bg 0.75))
     (builtin            teal)
     (comments           (doom-darken base5 0.45))
     (doc-comments       (doom-darken base5 0.45))
@@ -71,39 +71,73 @@
     (strings            green)
     (variables          violet)
     (numbers            magenta)
-    (region             `(,(doom-lighten (car bg-alt) 0.15) ,@(doom-lighten (cdr base0) 0.35)))
+    (region             `(,(doom-lighten (car base5) 0.15) ,@(doom-lighten (cdr base0) 0.15)))
     (error              red)
     (warning            yellow)
     (success            green)
     (vc-modified        orange)
     (vc-added           green)
     (vc-deleted         red)
-    (hl-line            (doom-blend base1 bg 0.3))
+    (hl-line            (doom-blend base5 bg 0.5))
     (cursor-color       '("#000000"))
     (+evil--default-cursor-color '("#000000"))
     (modeline-fg        nil))
 
   ;; EXTRA-FACES
   (
-   ((outline-1 &override) :foreground base0 :weight 'bold)
-   ((outline-2 &override) :foreground base0 :weight 'bold)
-   ((outline-3 &override) :foreground base0 :weight 'normal)
-   ((outline-4 &override) :foreground base0 :weight 'normal)
-   ((outline-5 &override) :foreground base0 :weight 'normal)
-   ((outline-6 &override) :foreground base0 :weight 'normal)
-   ((outline-7 &override) :foreground base0 :weight 'normal)
-   ((outline-8 &override) :foreground base0 :weight 'normal)
-   ((org-block &override) :inherit 'fixed-pitch)
-   ((org-verbatim &override) :foreground red :background nil :weight 'normal)
-   ((org-table &override) :background bg)
-   ((org-formula &override) :background bg)
-   ((org-ref-cite-face &override) :foreground red)
-   ((org-drawer &override) :foreground "#9F9F9F")
-   ((org-block-begin-line &override) :foreground base2 :background nil :underline fg)
-   ((org-block-end-line &override) :foreground base2 :background nil :underline nil :overline fg)
-   ((org-document-info-keyword &override) :foreground base2)
-   ((ivy-current-match &override) :foreground fg)
-   )
- 
+   ((outline-1 &override)  :foreground base0 :weight 'bold)
+   ((outline-2 &override)  :foreground base0 :weight 'bold)
+   ((outline-3 &override)  :foreground base0 :weight 'bold)
+   ((outline-4 &override)  :foreground base0 :weight 'bold)
+   ((outline-5 &override)  :foreground base0 :weight 'bold)
+   ((outline-6 &override)  :foreground base0 :weight 'bold)
+   ((outline-7 &override)  :foreground base0 :weight 'bold)
+   ((outline-8 &override)  :foreground base0 :weight 'bold)
+
+   ((org-block &override) 
+    :inherit 'fixed-pitch)
+
+   ((org-verbatim &override) 
+    :foreground red 
+    :background nil 
+    :weight 'normal)
+
+   ((org-table &override) 
+    :background bg)
+
+   ((org-formula &override) 
+    :background bg)
+
+   ((org-ref-cite-face &override) 
+    :foreground red)
+
+   ((org-drawer &override) 
+    :foreground "#9F9F9F")
+
+   ((org-block-begin-line &override) 
+ ;;   :inherit 'fixed-pitch
+    :foreground base2 
+    :background nil 
+    :underline fg)
+
+   ((org-block-end-line &override) 
+ ;;   :inherit 'fixed-pitch
+    :foreground base2 
+    :background nil 
+    :underline nil 
+    :overline fg)
+
+   ((org-document-info-keyword &override) 
+    :foreground base2)
+
+   ((ivy-current-match &override) 
+    :foreground fg)
+   
+   ((org-link &override)
+    :foreground red
+    :background nil
+    :underline red)
+   ) 
+
   ;; EXTRA-VARS
   ())
